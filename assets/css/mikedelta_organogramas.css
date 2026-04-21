@@ -1,0 +1,10 @@
+.md-cartao {
+  background: transparent;
+  border: none;
+}
+.md-cartao-inner {
+  transition: transform 0.2s;
+}
+.md-cartao-inner:hover {
+  transform: scale(1.02);
+}

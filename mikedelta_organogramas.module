@@ -1,0 +1,41 @@
+<?php
+
+/**
+ * @file
+ * Arquivo principal do módulo MikeDelta Organogramas.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_theme().
+ */
+function mikedelta_organogramas_theme($existing, $type, $theme, $path) {
+  return [
+    'mikedelta_organograma_page' => [
+      'variables' => ['dados_membros' => NULL],
+      'template' => 'organograma-page',
+    ],
+  ];
+}
+
+/**
+ * Implements hook_help().
+ */
+function mikedelta_organogramas_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    case 'help.page.mikedelta_organogramas':
+      $output = '<h3>' . t('Sobre o MikeDelta Organogramas') . '</h3>';
+      $output .= '<p>' . t('O módulo MikeDelta Organogramas permite a criação e o gerenciamento de organogramas hierárquicos de forma responsiva e com renderização 100% offline (ideal para intranets isoladas).') . '</p>';
+      $output .= '<h3>' . t('Como utilizar') . '</h3>';
+      $output .= '<dl>';
+      $output .= '<dt>' . t('1. Cadastrar Membros') . '</dt>';
+      $output .= '<dd>' . t('Acesse <em>Estrutura > Organograma > Adicionar Membro</em>. Preencha os dados rigorosamente conforme as máscaras (ex: RETELMA 0000-0000). Você pode definir as cores do cartão utilizando a paleta de cores HTML5.') . '</dd>';
+      $output .= '<dt>' . t('2. Definir Hierarquia (Drag n Drop)') . '</dt>';
+      $output .= '<dd>' . t('Acesse a aba <em>Listar Membros</em>. Utilize o ícone de cruz ao lado do nome do militar para arrastar a linha. Arraste para a direita para tornar um militar subordinado ao de cima. Arraste para cima/baixo para mudar a ordem de precedência (peso). Clique em Salvar ao final.') . '</dd>';
+      $output .= '<dt>' . t('3. Visualização Pública') . '</dt>';
+      $output .= '<dd>' . t('O organograma é renderizado automaticamente e de forma segura na rota <strong>/md-organograma</strong>.') . '</dd>';
+      $output .= '</dl>';
+      return $output;
+  }
+}

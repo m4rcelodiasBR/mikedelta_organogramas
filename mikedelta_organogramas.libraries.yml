@@ -1,0 +1,13 @@
+treant:
+  version: 1.0.0
+  css:
+    theme:
+      assets/css/Treant.css: {}
+      assets/css/mikedelta_organogramas.css: {}
+  js:
+    assets/js/raphael.js: { weight: -20 }
+    assets/js/Treant.js: { weight: -19 }
+    assets/js/mikedelta_organogramas.js: {}
+  dependencies:
+    - core/drupalSettings
+    - core/once

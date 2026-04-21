@@ -1,0 +1,39 @@
+mikedelta_organogramas.public_view:
+  path: '/md-organograma'
+  defaults:
+    _controller: '\Drupal\mikedelta_organogramas\Controller\OrganogramaController::exibir'
+    _title: 'Organograma'
+  requirements:
+    _permission: 'access content'
+
+mikedelta_organogramas.admin_list:
+  path: '/admin/structure/md-organograma'
+  defaults:
+    _form: '\Drupal\mikedelta_organogramas\Form\OrganogramaListForm'
+    _title: 'Gerenciar Organograma'
+  requirements:
+    _permission: 'administrar mikedelta organogramas'
+
+mikedelta_organogramas.admin_add:
+  path: '/admin/structure/md-organograma/add'
+  defaults:
+    _form: '\Drupal\mikedelta_organogramas\Form\MembroForm'
+    _title: 'Cadastrar Membro'
+  requirements:
+    _permission: 'administrar mikedelta organogramas'
+
+mikedelta_organogramas.admin_edit:
+  path: '/admin/structure/md-organograma/edit/{id}'
+  defaults:
+    _form: '\Drupal\mikedelta_organogramas\Form\MembroForm'
+    _title: 'Editar Membro'
+  requirements:
+    _permission: 'administrar mikedelta organogramas'
+
+mikedelta_organogramas.admin_delete:
+  path: '/admin/structure/md-organograma/delete/{id}'
+  defaults:
+    _form: '\Drupal\mikedelta_organogramas\Form\MembroDeleteForm'
+    _title: 'Excluir Membro'
+  requirements:
+    _permission: 'administrar mikedelta organogramas'

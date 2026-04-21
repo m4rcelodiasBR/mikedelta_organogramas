@@ -1,0 +1,96 @@
+<?php
+
+/**
+ * @file
+ * Funções de instalação e esquema do banco de dados para MikeDelta Organogramas.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function mikedelta_organogramas_schema() {
+  $schema['mikedelta_organograma_membros'] = [
+    'description' => 'Armazena os membros do organograma e suas hierarquias.',
+    'fields' => [
+      'id' => [
+        'description' => 'Chave primária do membro.',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+      'foto_fid' => [
+        'description' => 'File ID da foto do militar.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => FALSE,
+      ],
+      'cpo_id' => [
+        'description' => 'Código da função (Ex: CPO-01).',
+        'type' => 'varchar',
+        'length' => 10,
+        'not null' => TRUE,
+        'default' => '', // Permite exibir vazio conforme solicitado
+      ],
+      'funcao_nome' => [
+        'description' => 'Nome da função.',
+        'type' => 'varchar',
+        'length' => 40,
+        'not null' => TRUE,
+        'default' => '',
+      ],
+      'posto_espec' => [
+        'description' => 'Posto e Quadro (Ex: 1T (AA)).',
+        'type' => 'varchar',
+        'length' => 10,
+        'not null' => TRUE,
+        'default' => '',
+      ],
+      'nome_guerra' => [
+        'description' => 'Nome de guerra do militar.',
+        'type' => 'varchar',
+        'length' => 40,
+        'not null' => TRUE,
+        'default' => '',
+      ],
+      'retelma' => [
+        'description' => 'Telefone/RETELMA (Formato 0000-0000).',
+        'type' => 'varchar',
+        'length' => 9,
+        'not null' => TRUE,
+        'default' => '',
+      ],
+      'cor_principal' => [
+        'description' => 'Cor primária do cartão (Hexadecimal).',
+        'type' => 'varchar',
+        'length' => 7,
+        'not null' => TRUE,
+        'default' => '#0f172a',
+      ],
+      'cor_secundaria' => [
+        'description' => 'Cor secundária do cartão para gradiente (Hexadecimal).',
+        'type' => 'varchar',
+        'length' => 7,
+        'not null' => TRUE,
+        'default' => '#1e293b',
+      ],
+      'superior_id' => [
+        'description' => 'ID do chefe imediato (Pai). 0 ou Nulo significa topo da árvore.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => FALSE,
+      ],
+      'peso' => [
+        'description' => 'Ordem de exibição entre membros do mesmo nível (TableDrag).',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+    ],
+    'primary key' => ['id'],
+    'indexes' => [
+      'hierarquia' => ['superior_id', 'peso'],
+    ],
+  ];
+
+  return $schema;
+}

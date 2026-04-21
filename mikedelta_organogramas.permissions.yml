@@ -1,0 +1,4 @@
+administrar mikedelta organogramas:
+  title: 'Administrar Organograma MikeDelta'
+  description: 'Permite criar, editar, excluir membros e reordenar a árvore hierárquica.'
+  restrict access: true
