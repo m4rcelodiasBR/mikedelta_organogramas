@@ -1,39 +1,54 @@
 mikedelta_organogramas.public_view:
-  path: '/md-organograma'
+  path: "/md-organograma"
   defaults:
     _controller: '\Drupal\mikedelta_organogramas\Controller\OrganogramaController::exibir'
-    _title: 'Organograma'
+    _title: "Organograma"
   requirements:
-    _permission: 'access content'
+    _permission: "access content"
 
 mikedelta_organogramas.admin_list:
-  path: '/admin/structure/md-organograma'
+  path: "/admin/structure/md-organograma"
   defaults:
     _form: '\Drupal\mikedelta_organogramas\Form\OrganogramaListForm'
-    _title: 'Gerenciar Organograma'
+    _title: "Gerenciar Organograma"
   requirements:
-    _permission: 'administrar mikedelta organogramas'
+    _permission: "administrar mikedelta organogramas"
 
 mikedelta_organogramas.admin_add:
-  path: '/admin/structure/md-organograma/add'
+  path: "/admin/structure/md-organograma/add"
   defaults:
     _form: '\Drupal\mikedelta_organogramas\Form\MembroForm'
-    _title: 'Adicionar Membro'
+    _title: "Adicionar Membro"
   requirements:
-    _permission: 'administrar mikedelta organogramas'
+    _permission: "administrar mikedelta organogramas"
 
 mikedelta_organogramas.admin_edit:
-  path: '/admin/structure/md-organograma/edit/{id}'
+  path: "/admin/structure/md-organograma/edit/{id}"
   defaults:
     _form: '\Drupal\mikedelta_organogramas\Form\MembroForm'
-    _title: 'Editar Membro'
+    _title: "Editar Membro"
   requirements:
-    _permission: 'administrar mikedelta organogramas'
+    _permission: "administrar mikedelta organogramas"
 
 mikedelta_organogramas.admin_delete:
-  path: '/admin/structure/md-organograma/delete/{id}'
+  path: "/admin/structure/md-organograma/delete/{id}"
   defaults:
     _form: '\Drupal\mikedelta_organogramas\Form\MembroDeleteForm'
-    _title: 'Excluir Membro'
+    _title: "Excluir Membro"
   requirements:
-    _permission: 'administrar mikedelta organogramas'
+    _permission: "administrar mikedelta organogramas"
+
+mikedelta_organogramas.backup_restore:
+  path: "/admin/structure/md-organograma/backup-restore"
+  defaults:
+    _form: '\Drupal\mikedelta_organogramas\Form\BackupRestoreForm'
+    _title: "Backup e Restauração"
+  requirements:
+    _permission: "administrar mikedelta organogramas"
+
+mikedelta_organogramas.export:
+  path: "/admin/structure/md-organograma/export"
+  defaults:
+    _controller: '\Drupal\mikedelta_organogramas\Controller\BackupController::exportar'
+  requirements:
+    _permission: "administrar mikedelta organogramas"

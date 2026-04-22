@@ -52,22 +52,26 @@ class OrganogramaController extends ControllerBase {
     ];
 
     return [
-      '#theme' => 'mikedelta_organograma_page',
-      '#title' => 'Organograma',
-      '#dados_membros' => $membros,
-      '#dados_organograma' => $dados_organograma,
-      '#attached' => [
-        'library' => [
-          'mikedelta_organogramas/treant',
-        ],
-        'drupalSettings' => [
-          'mikeDeltaData' => [
-            'membros' => $membros,
+      'titulo_pagina' => [
+        '#markup' => '<div class="container"><h1 class="page-title mb-4">' . $this->t('Organograma') . '</h1></div>',
+      ],
+      'conteudo_organograma' => [
+        '#theme' => 'mikedelta_organograma_page',
+        '#dados_membros' => $membros,
+        '#dados_organograma' => $dados_organograma,
+        '#attached' => [
+          'library' => [
+            'mikedelta_organogramas/treant',
+          ],
+          'drupalSettings' => [
+            'mikeDeltaData' => [
+              'membros' => $membros,
+            ],
           ],
         ],
-      ],
-      '#cache' => [
-        'tags' => ['mikedelta_organograma:view'],
+        '#cache' => [
+          'tags' => ['mikedelta_organograma:view'],
+        ],
       ],
     ];
   }

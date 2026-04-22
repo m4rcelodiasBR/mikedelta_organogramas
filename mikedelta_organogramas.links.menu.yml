@@ -1,18 +1,24 @@
 mikedelta_organogramas.admin_menu:
-  title: 'Organograma (MikeDelta)'
-  description: 'Gerenciar membros do organograma.'
+  title: "Organograma (MikeDelta)"
+  description: "Gerenciar membros do organograma."
   parent: system.admin_structure
   route_name: mikedelta_organogramas.admin_list
   weight: 100
 
 mikedelta_organogramas.admin_list_menu:
-  title: 'Listar Membros'
+  title: "Listar Membros"
   parent: mikedelta_organogramas.admin_menu
   route_name: mikedelta_organogramas.admin_list
   weight: 10
 
 mikedelta_organogramas.admin_add_menu:
-  title: 'Adicionar Membro'
+  title: "Adicionar Membro"
   parent: mikedelta_organogramas.admin_menu
   route_name: mikedelta_organogramas.admin_add
   weight: 20
+
+mikedelta_organogramas.admin_backup_menu:
+  title: "Backup/Restore"
+  parent: mikedelta_organogramas.admin_menu
+  route_name: mikedelta_organogramas.backup_restore
+  weight: 30

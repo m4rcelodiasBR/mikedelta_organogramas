@@ -184,7 +184,7 @@ class MembroForm extends FormBase {
       '#options' => [
         1 => $this->t('Posição 1 (Esquerda)'),
         2 => $this->t('Posição 2 (Centro-Esquerda)'),
-        3 => $this->t('Posição 3 (Centro)'),
+        3 => $this->t('Posição 3 (Centro - Padrão)'),
         4 => $this->t('Posição 4 (Centro-Direita)'),
         5 => $this->t('Posição 5 (Direita)'),
       ],
