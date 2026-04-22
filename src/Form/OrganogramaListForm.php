@@ -6,6 +6,7 @@ use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Url;
+use Drupal\Core\Cache\Cache;
 
 class OrganogramaListForm extends FormBase {
 
@@ -39,18 +40,39 @@ class OrganogramaListForm extends FormBase {
   public function buildForm(array $form, FormStateInterface $form_state) {
     $membros = $this->getListaArvore();
 
+    $form['top_actions'] = [
+      '#type' => 'container',
+      '#attributes' => [
+        'style' => 'display: flex; justify-content: flex-end; gap: 10px; margin-bottom: 20px; border-bottom: 1px solid #ccc; padding-bottom: 10px;',
+      ],
+    ];
+
+    $form['top_actions']['view_org'] = [
+      '#type' => 'link',
+      '#title' => 'Ver Organograma',
+      '#url' => Url::fromRoute('mikedelta_organogramas.public_view'),
+      '#attributes' => ['class' => ['button', 'button--primary']],
+    ];
+
+    $form['top_actions']['help_org'] = [
+      '#type' => 'link',
+      '#title' => 'Ajuda do Módulo',
+      '#url' => Url::fromRoute('help.page', ['name' => 'mikedelta_organogramas']),
+      '#attributes' => ['class' => ['button']],
+    ];
+
     $form['membros'] = [
       '#type' => 'table',
       '#header' => [
-        $this->t('Militar'),
-        $this->t('Função'),
-        $this->t('CPO-ID'),
+        $this->t('Membro'),
+        $this->t('Função/Setor'),
+        $this->t('Código'),
         $this->t('Peso'),
         $this->t('Superior'),
         $this->t('Operações'),
       ],
       '#empty' => $this->t('Nenhum membro cadastrado. Vá para a aba "Adicionar Membro".'),
-      // Configuração mágica do TableDrag nativo do Drupal
+
       '#tabledrag' => [
         [
           'action' => 'match',
@@ -59,7 +81,7 @@ class OrganogramaListForm extends FormBase {
           'subgroup' => 'membro-parent',
           'source' => 'membro-id',
           'hidden' => TRUE,
-          'limit' => 10, // Profundidade máxima de subordinação visual
+          'limit' => 10,
         ],
         [
           'action' => 'order',
@@ -80,24 +102,24 @@ class OrganogramaListForm extends FormBase {
           '#size' => $membro->nivel,
         ],
         'texto' => [
-          '#markup' => '<strong>' . $membro->posto_espec . ' ' . $membro->nome_guerra . '</strong>',
+          '#markup' => '<strong>' . $membro->titulo_cargo . ' ' . $membro->nome . '</strong>',
         ],
       ];
 
       // Coluna 2: Função
-      $form['membros'][$id]['funcao'] = [
-        '#markup' => $membro->funcao_nome,
+      $form['membros'][$id]['nome_funcao'] = [
+        '#markup' => $membro->nome_funcao,
       ];
 
       // Coluna 3: CPO-ID
-      $form['membros'][$id]['cpo_id'] = [
-        '#markup' => $membro->cpo_id,
+      $form['membros'][$id]['codigo_funcao'] = [
+        '#markup' => $membro->codigo_funcao,
       ];
 
       // Coluna 4: Peso (Oculta visualmente pelo CSS do TableDrag)
       $form['membros'][$id]['peso'] = [
         '#type' => 'weight',
-        '#title' => $this->t('Peso para @nome', ['@nome' => $membro->nome_guerra]),
+        '#title' => $this->t('Peso para @nome', ['@nome' => $membro->nome]),
         '#title_display' => 'invisible',
         '#default_value' => $membro->peso,
         '#attributes' => ['class' => ['membro-weight']],
@@ -161,6 +183,7 @@ class OrganogramaListForm extends FormBase {
         ])
         ->condition('id', $id)
         ->execute();
+        Cache::invalidateTags(['mikedelta_organograma:view']);
     }
 
     \Drupal::messenger()->addStatus($this->t('A hierarquia e ordem do organograma foram atualizadas.'));

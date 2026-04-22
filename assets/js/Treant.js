@@ -580,7 +580,23 @@
 
                 // handle stacked children positioning
                 if ( node.stackParent ) { // handle the parent of stacked children
-                    node.modifier += this.nodeDB.get( node.stackChildren[0] ).size()/2 + node.connStyle.stackIndent;
+                    // [código original] node.modifier += this.nodeDB.get( node.stackChildren[0] ).size()/2 + node.connStyle.stackIndent;
+                    /* 
+                    * ==================================================
+                    * INÍCIO PARA O MÓDULO MIKEDELTA ORGANOGRAMAS
+                    * ==================================================
+                    */
+                    var offset = node.size() / 2;
+                        if (node.meta && node.meta.posicao && node.meta.posicao !== 5) {
+                            var partWidth = node.size() / 4;
+                            offset = (partWidth * node.meta.posicao) - (partWidth / 2);
+                        }
+                    node.modifier += offset + node.connStyle.stackIndent;
+                    /* 
+                    * ==================================================
+                    * FIM PARA O MÓDULO MIKEDELTA ORGANOGRAMAS
+                    * ==================================================
+                    */
                 }
                 else if ( node.stackParentId ) { // handle stacked children
                     node.prelim = 0;
@@ -1558,8 +1574,37 @@
 
             // if pseudo, a virtual center is used
             if ( orient === 'NORTH' ) {
-                point.x = (this.pseudo) ? this.X - this.Tree().CONFIG.subTeeSeparation/2 : this.X + this.width/2;
+                // [código original]point.x = (this.pseudo) ? this.X - this.Tree().CONFIG.subTeeSeparation/2 : this.X + this.width/2;
+                /*
+                * =====================================================
+                * INICIO PARA MIKEDELTA ORGANOGRAMAS
+                * =====================================================
+                */
+                var offset = this.width / 2; // Padrão
+
+                if (startPoint) {
+                    // SAÍDA DA LINHA (Ponto de Baixo): Usa a configuração do próprio cartão
+                    if (this.meta && this.meta.posicao && this.meta.posicao !== 5) {
+                        var partWidth = this.width / 4;
+                        offset = (partWidth * this.meta.posicao) - (partWidth / 2);
+                    }
+                } else {
+                    // ENTRADA DA LINHA (Ponto de Cima): Herda a configuração do CHEFE
+                    var parentNode = this.parent();
+                    if (parentNode && parentNode.meta && parentNode.meta.posicao && parentNode.meta.posicao !== 5) {
+                        var partWidth = this.width / 4;
+                        offset = (partWidth * parentNode.meta.posicao) - (partWidth / 2);
+                    }
+                }
+
+                point.x = (this.pseudo) ? this.X - this.Tree().CONFIG.subTeeSeparation/2 : this.X + offset;
                 point.y = (startPoint) ? this.Y + this.height : this.Y;
+                /*
+                * =====================================================
+                * FIM PARA MIKEDELTA ORGANOGRAMAS
+                * =====================================================
+                */
+                // [código-original] point.y = (startPoint) ? this.Y + this.height : this.Y;
             }
             else if (orient === 'SOUTH') {
                 point.x = (this.pseudo) ? this.X - this.Tree().CONFIG.subTeeSeparation/2 : this.X + this.width/2;

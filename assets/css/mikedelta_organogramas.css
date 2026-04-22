@@ -2,9 +2,87 @@
   background: transparent;
   border: none;
 }
+
 .md-cartao-inner {
-  transition: transform 0.2s;
+  width: 220px;
+  height: 100px;
+  display: flex;
+  overflow: visible;
+  position: relative;
+  border: 1px solid #475569;
+  border-radius: 6px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+  transition: transform 0.2s ease-in-out;
 }
+
 .md-cartao-inner:hover {
   transform: scale(1.02);
+}
+
+.md-cartao-cpoid {
+  position: absolute;
+  top: -15px;
+  right: -8px;
+  padding: 3px 15px;
+  font-size: .6rem;
+  font-weight: bold;
+  white-space: nowrap;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  z-index: 10;
+}
+
+.md-cartao-foto-container {
+  width: 4.5rem;
+  max-width: 4.6rem;
+  background-color: #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px 0 0 6px;
+  overflow: hidden;
+}
+
+.md-cartao-foto {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.md-cartao-sem-foto {
+  font-size: 10px;
+  color: #64748b;
+  text-align: center;
+}
+
+.md-cartao-dados {
+  flex: 1;
+  padding: 6px 8px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.md-cartao-header {
+  display: flex;
+  padding-bottom: 3px;
+  margin-bottom: 3px;
+}
+
+.md-cartao-funcao {
+  font-weight: bold;
+  font-size: .7rem;
+  width: 100%;
+}
+
+.md-cartao-nome {
+  font-size: .65rem;
+  font-weight: 500;
+  margin-top: 1px;
+}
+
+.md-cartao-retelma {
+  font-size: .6rem;
+  margin-top: 1px;
+  line-height: 1.1;
 }

@@ -6,6 +6,8 @@ use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Database\Database;
 use Drupal\file\Entity\File;
+use Drupal\Core\Url;
+use Drupal\Core\Cache\Cache;
 
 class MembroForm extends FormBase {
 
@@ -30,80 +32,126 @@ class MembroForm extends FormBase {
     }
     
     $query = $conexao->select('mikedelta_organograma_membros', 'm');
-    $query->fields('m', ['id', 'nome_guerra', 'posto_espec']);
+    $query->fields('m', ['id', 'nome', 'titulo_cargo']);
     if ($id) {
       $query->condition('id', $id, '<>');
     }
 
     $resultados = $query->execute();
     
-    $opcoes_superiores = ['0' => '- Topo do Organograma (Nenhum) -'];
+    $opcoes_superiores = ['0' => '- Topo -'];
     foreach ($resultados as $row) {
-      $opcoes_superiores[$row->id] = $row->posto_espec . ' ' . $row->nome_guerra;
+      $opcoes_superiores[$row->id] = $row->titulo_cargo . ' ' . $row->nome;
     }
 
-    // Heurística de Nielsen: Prevenção de Erros e Design Minimalista
+    $form['top_actions'] = [
+      '#type' => 'container',
+      '#attributes' => [
+        'style' => 'display: flex; justify-content: flex-end; gap: 10px; margin-bottom: 20px; border-bottom: 1px solid #ccc; padding-bottom: 10px;',
+      ],
+    ];
+
+    $form['top_actions']['view_org'] = [
+      '#type' => 'link',
+      '#title' => 'Ver Organograma',
+      '#url' => Url::fromRoute('mikedelta_organogramas.public_view'),
+      '#attributes' => ['class' => ['button', 'button--primary']],
+    ];
+
+    $form['top_actions']['help_org'] = [
+      '#type' => 'link',
+      '#title' => 'Ajuda do Módulo',
+      '#url' => Url::fromRoute('help.page', ['name' => 'mikedelta_organogramas']),
+      '#attributes' => ['class' => ['button']],
+    ];
+
     $form['#tree'] = TRUE;
 
     $form['foto_fid'] = [
       '#type' => 'managed_file',
-      '#title' => $this->t('Foto do Militar'),
-      '#description' => $this->t('Formatos permitidos: png jpg jpeg. A imagem será redimensionada automaticamente no organograma.'),
-      '#upload_location' => 'public://md-organograma_fotos/',
+      '#title' => $this->t('Foto'),
+      '#description' => $this->t('Tamanho máximo: 1MB. Formatos permitidos: png jpg jpeg.'),
+      '#upload_location' => 'public://md_organograma_fotos/',
       '#upload_validators' => [
         'file_validate_extensions' => ['png jpg jpeg'],
+        'file_validate_size' => [1024 * 1024],
       ],
       '#default_value' => $membro && $membro->foto_fid ? [$membro->foto_fid] : [],
     ];
 
-    $form['cpo_id'] = [
+    $form['codigo_funcao'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Código da Função'),
-      '#maxlength' => 10,
-      '#description' => $this->t('Ex: CPO-01. Pode ser deixado em branco se a função não possuir código.'),
+      '#maxlength' => 30,
+      '#description' => $this->t('Ex: CPO-01, MD-03, SSPM-01.2. Pode ser deixado em branco se a função não possuir código.'),
       '#required' => FALSE,
-      '#default_value' => $membro ? $membro->cpo_id : '',
+      '#default_value' => $membro ? $membro->codigo_funcao : '',
     ];
 
-    $form['funcao_nome'] = [
+    $form['cores_codigo_funcao'] = [
+      '#type' => 'details',
+      '#title' => $this->t('Personalização do Código da Função (Tag)'),
+      '#open' => FALSE,
+    ];
+
+    $form['cores_codigo_funcao']['cor_fundo'] = [
+      '#type' => 'color',
+      '#title' => $this->t('Cor de Fundo Função (Tag)'),
+      '#default_value' => $membro ? $membro->codigo_funcao_bgcolor : '#0284c7',
+    ];
+
+    $form['cores_codigo_funcao']['cor_texto'] = [
+      '#type' => 'color',
+      '#title' => $this->t('Cor do Texto Função (Tag)'),
+      '#default_value' => $membro ? $membro->codigo_funcao_color : '#ffffff',
+    ];
+
+    $form['nome_funcao'] = [
       '#type' => 'textfield',
-      '#title' => $this->t('Nome da Função'),
-      '#maxlength' => 40,
+      '#title' => $this->t('Nome da Função/Setor'),
+      '#maxlength' => 50,
       '#description' => $this->t('Ex: Assessor do Secretário, Ajudante para Sistemas.'),
       '#required' => TRUE,
-      '#default_value' => $membro ? $membro->funcao_nome : '',
+      '#default_value' => $membro ? $membro->nome_funcao : '',
     ];
 
-    $form['posto_espec'] = [
+    $form['titulo_cargo'] = [
       '#type' => 'textfield',
-      '#title' => $this->t('Posto/Quadro'),
-      '#maxlength' => 10,
-      '#description' => $this->t('Ex: CF(IM), 1T(AA).'),
-      '#required' => TRUE,
-      '#default_value' => $membro ? $membro->posto_espec : '',
+      '#title' => $this->t('Título, Cargo ou Posto/Quadro'),
+      '#maxlength' => 20,
+      '#description' => $this->t('Ex: CF(IM), 1T(AA), Diretor, Gerente.'),
+      '#required' => FALSE,
+      '#default_value' => $membro ? $membro->titulo_cargo : '',
     ];
 
-    $form['nome_guerra'] = [
+    $form['nome'] = [
       '#type' => 'textfield',
-      '#title' => $this->t('Nome de Guerra'),
-      '#maxlength' => 40,
-      '#required' => TRUE,
-      '#default_value' => $membro ? $membro->nome_guerra : '',
+      '#title' => $this->t('Nome do Membro'),
+      '#maxlength' => 50,
+      '#required' => FALSE,
+      '#default_value' => $membro ? $membro->nome : '',
     ];
 
     $form['retelma'] = [
       '#type' => 'textfield',
-      '#title' => $this->t('Telefone/RETELMA'),
+      '#title' => $this->t('RETELMA'),
       '#maxlength' => 9,
       '#description' => $this->t('Formato obrigatório: 0000-0000'),
-      '#required' => TRUE,
+      '#required' => FALSE,
       '#default_value' => $membro ? $membro->retelma : '',
     ];
 
-    // Utilizando o Colorpicker nativo do HTML5
+    $form['email'] = [
+      '#type' => 'email',
+      '#title' => $this->t('E-mail'),
+      '#maxlength' => 100,
+      '#description' => $this->t('Endereço de e-mail válido. Opcional.'),
+      '#default_value' => $membro ? $membro->email : '',
+    ];
+
     $form['cor_principal'] = [
       '#type' => 'color',
-      '#title' => $this->t('Cor Principal do Cartão'),
+      '#title' => $this->t('Cor Primária do Cartão'),
       '#default_value' => $membro ? $membro->cor_principal : '#0f172a',
     ];
 
@@ -118,15 +166,41 @@ class MembroForm extends FormBase {
       '#type' => 'select',
       '#title' => $this->t('Superior Imediato'),
       '#options' => $opcoes_superiores,
-      '#description' => $this->t('Selecione a quem este militar está subordinado para montar a hierarquia visual.'),
+      '#description' => $this->t('Selecione a quem este membro está subordinado para montar a hierarquia visual.'),
       '#default_value' => $membro ? ($membro->superior_id ?: '0') : '0',
+    ];
+
+    $form['empilhar_filhos'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Empilhar subordinados verticalmente?'),
+      '#description' => $this->t('Marque se os subordinados diretos desta função deverão aparecer empilhados em formato de lista. Deixe desmarcado para espalhá-los lado a lado.'),
+      '#default_value' => $membro ? $membro->empilhar_filhos : 0,
+    ];
+
+    $form['posicao_linha'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Ponto de Saída da Linha (Subordinados)'),
+      '#description' => $this->t('Escolha entre as cinco posições para a linha que conecta aos subordinados.'),
+      '#options' => [
+        1 => $this->t('Posição 1 (Esquerda)'),
+        2 => $this->t('Posição 2 (Centro-Esquerda)'),
+        3 => $this->t('Posição 3 (Centro)'),
+        4 => $this->t('Posição 4 (Centro-Direita)'),
+        5 => $this->t('Posição 5 (Direita)'),
+      ],
+      '#default_value' => $membro ? $membro->posicao_linha : 3,
     ];
 
     $form['actions']['#type'] = 'actions';
     $form['actions']['submit'] = [
       '#type' => 'submit',
-      '#value' => $this->t('Salvar Membro'),
+      '#value' => $this->t('Salvar'),
       '#button_type' => 'primary',
+    ];
+    $form['actions']['submit_and_new'] = [
+      '#type' => 'submit',
+      '#value' => $this->t('Salvar e Adicionar Novo'),
+      '#name' => 'save_and_new',
     ];
 
     return $form;
@@ -135,10 +209,14 @@ class MembroForm extends FormBase {
   // Validação rigorosa dos dados antes de salvar (Blindagem)
   public function validateForm(array &$form, FormStateInterface $form_state) {
     $retelma = $form_state->getValue('retelma');
-    
-    // Expressão Regular (Regex) para forçar o padrão 0000-0000
-    if (!preg_match('/^\d{4}-\d{4}$/', $retelma)) {
+    $email = $form_state->getValue('email');
+
+    if (!empty($retelma) && !preg_match('/^\d{4}-\d{4}$/', $retelma)) {
       $form_state->setErrorByName('retelma', $this->t('O RETELMA deve estar exatamente no formato 0000-0000.'));
+    }
+
+    if (!empty($email) && !\Drupal::service('email.validator')->isValid($email)) {
+      $form_state->setErrorByName('email', $this->t('O e-mail informado não é válido.'));
     }
   }
 
@@ -160,30 +238,43 @@ class MembroForm extends FormBase {
 
     $campos = [
       'foto_fid' => $foto_fid,
-      'cpo_id' => $valores['cpo_id'],
-      'funcao_nome' => $valores['funcao_nome'],
-      'posto_espec' => $valores['posto_espec'],
-      'nome_guerra' => $valores['nome_guerra'],
+      'codigo_funcao' => $valores['codigo_funcao'],
+      'codigo_funcao_bgcolor' => $valores['cores_codigo_funcao']['cor_fundo'],
+      'codigo_funcao_color' => $valores['cores_codigo_funcao']['cor_texto'],
+      'nome_funcao' => $valores['nome_funcao'],
+      'titulo_cargo' => $valores['titulo_cargo'],
+      'nome' => $valores['nome'],
       'retelma' => $valores['retelma'],
+      'email' => $valores['email'],
       'cor_principal' => $valores['cor_principal'],
       'cor_secundaria' => $valores['cor_secundaria'],
       'superior_id' => $valores['superior_id'] == '0' ? NULL : $valores['superior_id'],
+      'posicao_linha' => $valores['posicao_linha'],
+      'empilhar_filhos' => $valores['empilhar_filhos'],
     ];
 
-   try {
+    try {
       if ($this->membroId) {
         Database::getConnection()->update('mikedelta_organograma_membros')
           ->fields($campos)
           ->condition('id', $this->membroId)
           ->execute();
+        Cache::invalidateTags(['mikedelta_organograma:view']);
         \Drupal::messenger()->addStatus($this->t('Membro atualizado com sucesso.'));
       } else {
         Database::getConnection()->insert('mikedelta_organograma_membros')
           ->fields($campos)
           ->execute();
+        Cache::invalidateTags(['mikedelta_organograma:view']);
         \Drupal::messenger()->addStatus($this->t('Membro cadastrado com sucesso.'));
       }
-      $form_state->setRedirect('mikedelta_organogramas.admin_list');
+
+      $botao_clicado = $form_state->getTriggeringElement()['#name'];
+      if ($botao_clicado === 'save_and_new') {
+        $form_state->setRedirect('mikedelta_organogramas.admin_add');
+      } else {
+        $form_state->setRedirect('mikedelta_organogramas.admin_list');
+      }
     } 
     catch (\Exception $e) {
       \Drupal::messenger()->addError($this->t('Erro ao salvar no banco de dados. Contate o administrador.'));

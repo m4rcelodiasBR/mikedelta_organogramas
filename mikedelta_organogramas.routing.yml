@@ -18,7 +18,7 @@ mikedelta_organogramas.admin_add:
   path: '/admin/structure/md-organograma/add'
   defaults:
     _form: '\Drupal\mikedelta_organogramas\Form\MembroForm'
-    _title: 'Cadastrar Membro'
+    _title: 'Adicionar Membro'
   requirements:
     _permission: 'administrar mikedelta organogramas'
 

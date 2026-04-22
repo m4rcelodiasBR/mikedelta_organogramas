@@ -1,6 +1,6 @@
 name: 'MikeDelta Organogramas'
 type: module
-description: 'Cria e gerencia organogramas responsivos, com controle de hierarquia e renderização 100% offline.'
+description: 'Cria e gerencia organogramas responsivos, com controle de hierarquia e renderização 100% offline. Módulo desenvolvido por Marcelo Dias da Silva.'
 core_version_requirement: ^10 || ^11
 package: MikeDelta
 version: 1.0.0

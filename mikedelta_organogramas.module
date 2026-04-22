@@ -10,10 +10,13 @@ use Drupal\Core\Routing\RouteMatchInterface;
 /**
  * Implements hook_theme().
  */
-function mikedelta_organogramas_theme($existing, $type, $theme, $path) {
+function mikedelta_organogramas_theme() {
   return [
     'mikedelta_organograma_page' => [
-      'variables' => ['dados_membros' => NULL],
+      'variables' => [
+        'dados_membros' => NULL,
+        'dados_organograma' => NULL,
+      ],
       'template' => 'organograma-page',
     ],
   ];
