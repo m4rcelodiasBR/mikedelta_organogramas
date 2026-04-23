@@ -46,15 +46,14 @@ class OrganogramaController extends ControllerBase {
       ];
     }
 
+    $is_logged_in = \Drupal::currentUser()->isAuthenticated();
+
     $dados_organograma = [
-      'is_logged_in' => \Drupal::currentUser()->isAuthenticated(),
-      'url_config' => Url::fromRoute('mikedelta_organogramas.admin_list')->toString(),
+      'is_logged_in' => $is_logged_in,
+      'url_config' => $is_logged_in ? Url::fromRoute('mikedelta_organogramas.admin_list')->toString() : '',
     ];
 
     return [
-      'titulo_pagina' => [
-        '#markup' => '<div class="container"><h1 class="page-title mb-4">' . $this->t('Organograma') . '</h1></div>',
-      ],
       'conteudo_organograma' => [
         '#theme' => 'mikedelta_organograma_page',
         '#dados_membros' => $membros,
@@ -71,6 +70,7 @@ class OrganogramaController extends ControllerBase {
         ],
         '#cache' => [
           'tags' => ['mikedelta_organograma:view'],
+          'contexts' => ['user.roles:authenticated'],
         ],
       ],
     ];

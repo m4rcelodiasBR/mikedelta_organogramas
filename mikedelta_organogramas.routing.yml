@@ -4,7 +4,7 @@ mikedelta_organogramas.public_view:
     _controller: '\Drupal\mikedelta_organogramas\Controller\OrganogramaController::exibir'
     _title: "Organograma"
   requirements:
-    _permission: "access content"
+    _access: 'TRUE'
 
 mikedelta_organogramas.admin_list:
   path: "/admin/structure/md-organograma"

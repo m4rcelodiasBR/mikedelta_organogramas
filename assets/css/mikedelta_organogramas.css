@@ -23,7 +23,7 @@
   position: absolute;
   top: -15px;
   right: -8px;
-  padding: 3px 15px;
+  padding: 4px 15px;
   font-size: .6rem;
   font-weight: bold;
   white-space: nowrap;
@@ -85,4 +85,10 @@
   font-size: .6rem;
   margin-top: 1px;
   line-height: 1.1;
+}
+
+.md-icone-email {
+  width: 14px;
+  height: 14px;
+  filter: brightness(0) invert(1);
 }

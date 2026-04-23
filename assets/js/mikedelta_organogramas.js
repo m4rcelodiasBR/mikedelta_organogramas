@@ -56,7 +56,7 @@
               
               ${m.codigo_funcao ? `<span class="md-cartao-cpoid" style="background-color: ${m.codigo_funcao_bgcolor}; color: ${m.codigo_funcao_color};" title="${m.codigo_funcao}">${m.codigo_funcao}</span>` : ""}
               
-              <div class="md-cartao-foto-container" style="box-shadow: inset -5px 0 0 ${m.codigo_funcao_bgcolor};">
+              <div class="md-cartao-foto-container" style="box-shadow: .3rem 0 0 ${m.codigo_funcao_bgcolor};">
                 ${m.foto_url ? `<img src="${m.foto_url}" class="md-cartao-foto" alt="Foto">` : `<div class="md-cartao-sem-foto">Sem<br>Foto</div>`}
               </div>
               
@@ -69,7 +69,7 @@
                 
                 <div class="md-cartao-retelma" style="color: ${corSubtexto};">
                   ${m.retelma ? "RET: " + m.retelma : ""}
-                  ${m.email ? `<a href="mailto:${m.email}" title="${m.email}" style="color: inherit; text-decoration: none; margin-left: 8px;"><i class="fa-solid fa-envelope"></i></a>` : ""}
+                  ${m.email ? `<a href="mailto:${m.email}" title="${m.email}" style="color: inherit; text-decoration: none; margin-left: 8px; display: inline-flex; align-items: center;"><img class="md-icone-email" src="/modules/mikedelta_organogramas/assets/icons/envelope.svg" alt="E-mail"></a>` : ""}
                 </div>
               </div>
             </div>
