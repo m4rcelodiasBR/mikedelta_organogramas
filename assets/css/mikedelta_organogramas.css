@@ -9,7 +9,6 @@
   display: flex;
   overflow: visible;
   position: relative;
-  border: 1px solid #475569;
   border-radius: 6px;
   box-shadow: 0 4px 6px rgba(0,0,0,0.3);
   transition: transform 0.2s ease-in-out;
@@ -88,7 +87,11 @@
 }
 
 .md-icone-email {
-  width: 14px;
-  height: 14px;
+  width: .7rem;
   filter: brightness(0) invert(1);
+  transition: filter 0.3s ease;
+}
+
+.md-icone-email:hover {
+  filter: invert(79%) sepia(56%) saturate(614%) hue-rotate(342deg) brightness(102%) contrast(96%);
 }

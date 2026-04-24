@@ -35,7 +35,6 @@
           var nodes = {};
           var tree_data = [config];
 
-          // Cria os nós HTML
           for (var i = 0; i < dadosMembros.length; i++) {
             var m = dadosMembros[i];
 
