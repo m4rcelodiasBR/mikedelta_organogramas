@@ -1,24 +1,43 @@
 # MikeDelta Organogramas
 
-Módulo customizado para Drupal 10/11 desenvolvido para a criação de organogramas responsivos em ambientes corporativos e militares. Projetado para funcionar com 100% de seus recursos em ambiente local (Offline/Intranet), sem requisições externas.
+Módulo Drupal desenvolvido para gerenciar e renderizar organogramas hierárquicos interativos, suportando múltiplas divisões e departamentos. Desenhado para atender padrões de intranets governamentais e militares.
 
-## Funcionalidades
-* Renderização visual avançada via `Treant.js` (Offline).
-* Gerenciamento de árvore hierárquica por Drag n' Drop (TableDrag nativo do Drupal).
-* Customização individual de cores (Gradientes) por setor ou militar via interface gráfica.
-* Formulário blindado via Form API (Proteção CSRF/XSS) com validações rígidas de expressões regulares (RETELMA).
-* Exclusão segura de ativos: Limpeza física automática de fotos do disco ao remover militares.
-* Abordagem moderna seguindo o padrão Drupal 10/11 (Sem jQuery forçado, utilizando `core/once` e `drupalSettings`).
+## 🚀 Funcionalidades
 
-## Instalação
-1. Copie a pasta `mikedelta_organogramas` para `web/modules/custom/`.
-2. Certifique-se de que as dependências JavaScript (`treant.js` e `raphael.js`) estão presentes no diretório `assets/js/`.
-3. Acesse o painel do Drupal em **Extensões** (`/admin/modules`) e ative o "MikeDelta Organogramas".
-4. Limpe o cache do Drupal (`drush cr`).
+* **Múltiplos Organogramas:** Crie infinitas estruturas departamentais independentes, cada uma com sua URL dedicada (`/md-organograma/slug-da-divisao`).
+* **Dashboard Centralizado:** Painel de administração unificado para gerenciamento rápido.
+* **Visualização Responsiva (Treant.js):** Renderização baseada em SVG e CSS, garantindo funcionamento 100% offline.
+* **Gestão de Hierarquia (Drag n' Drop):** Definição de laços de subordinação (Superior Imediato) de forma visual arrastando as linhas na interface administrativa.
+* **Customização Visual Avançada:**
+    * Formatação individual de cores (fundo, rodapé e *tags* de código de função).
+    * Controle de empilhamento de subordinados (layout horizontal ou vertical).
+    * Ajuste do ponto de ancoragem das linhas conectoras.
+* **Exportação/Importação Segura:**
+    * Backups granulares (por divisão) ou globais em formato JSON.
+    * Lógica de remapeamento automático de chaves estrangeiras (IDs) durante a importação para evitar colisões no banco de dados.
+    * Processamento Batch (barra de progresso) para arquivos grandes.
+* **Privacidade e Limpeza:** A exclusão de um membro remove rigorosamente do disco os arquivos de foto associados e trata a orfandade de subordinados remanescentes.
 
-## Uso
-* **Cadastro/Gerenciamento:** Acesse `Administração > Estrutura > Organograma` (`/admin/structure/md-organograma`).
-* **Visualização:** O gráfico gerado está disponível publicamente na rota `/md-organograma`.
+## 🛠️ Tecnologias Utilizadas
 
-## Arquitetura de Banco de Dados
-A tabela `mikedelta_organograma_membros` utiliza a estrutura de *Adjacency List* para permitir níveis infinitos de subordinação visual, implementando indexação composta para otimização de consultas da árvore gerada.
+* **Backend:** PHP 8+, Drupal Form API, Database Abstraction Layer, Batch API.
+* **Frontend:** JavaScript Nativo, Treant.js, Raphael.js, Drupal Behaviors, Flexbox CSS.
+* **Cache:** Invalidação granular via Drupal Cache Tags (suporte a APCu).
+
+## ⚙️ Instalação e Configuração
+
+1.  Mova a pasta `mikedelta_organogramas` para o diretório `web/modules/custom/` do seu Drupal.
+2.  Acesse o servidor via terminal e ative o módulo:
+    ```bash
+    drush en mikedelta_organogramas -y
+    ```
+3.  Vá para `Estrutura > Organogramas (MikeDelta)` ou acesse a rota `/admin/structure/md-organogramas-dashboard` para começar a criar as divisões.
+
+## ⚠️ Requisitos Técnicos e Limitações
+
+* **Fotos de Perfil:** Permitido apenas arquivos `jpg`, `jpeg` e `png` até 1MB.
+* **Backup:** Os arquivos JSON não carregam os metadados binários das imagens dos usuários. Ao restaurar um backup, os campos `foto_fid` são redefinidos para `0`, sendo necessário o reenvio das mídias.
+* **Campos formatados:** O campo de telefone/RETELMA exige validação Regex estrita no formato `0000-0000`.
+
+---
+*Desenvolvido sob arquitetura MVC adaptada para o ecosistema Drupal.*

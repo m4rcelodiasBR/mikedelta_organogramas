@@ -15,6 +15,13 @@
 {# Título da Página #}
 <h1 class="page-title mb-3">Organograma</h1>
 
+{# Título do Organograma (se existir) #}
+{% if titulo_organograma %}
+  <h3 class="mb-3" style="text-align: center;">
+    {{ titulo_organograma }}
+  </h3>
+{% endif %}
+
 {# Container do Organograma #}
 <div class="organograma-wrapper bg-transparent" style="width: 100%; height: auto; overflow: visible; padding-top: 40px 0;">
   <div id="mikedelta-tree" style="width: 100%; height: 100%;"></div>

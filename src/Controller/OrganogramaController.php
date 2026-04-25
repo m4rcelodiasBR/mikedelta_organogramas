@@ -9,11 +9,22 @@ use Drupal\Core\Url;
 
 class OrganogramaController extends ControllerBase {
 
-  public function exibir() {
+  public function exibir($slug = NULL) {
     $conexao = Database::getConnection();
-    // Busca todos os membros ordenados pelo peso (a ordem que você arrastou no painel)
+
+    $organograma = $conexao->select('mikedelta_organogramas_lista', 'l')
+      ->fields('l')
+      ->condition('slug', $slug)
+      ->execute()
+      ->fetchObject();
+
+    if (!$organograma) {
+      throw new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException();
+    }
+
     $query = $conexao->select('mikedelta_organograma_membros', 'm')
       ->fields('m')
+      ->condition('organograma_id', $organograma->id)
       ->orderBy('peso', 'ASC');
     $resultados = $query->execute()->fetchAll();
 
@@ -50,7 +61,7 @@ class OrganogramaController extends ControllerBase {
 
     $dados_organograma = [
       'is_logged_in' => $is_logged_in,
-      'url_config' => $is_logged_in ? Url::fromRoute('mikedelta_organogramas.admin_list')->toString() : '',
+      'url_config' => $is_logged_in ? Url::fromRoute('mikedelta_organogramas.admin_list', ['organograma_id' => $organograma->id])->toString() : '',
     ];
 
     return [
@@ -58,9 +69,11 @@ class OrganogramaController extends ControllerBase {
         '#theme' => 'mikedelta_organograma_page',
         '#dados_membros' => $membros,
         '#dados_organograma' => $dados_organograma,
+        '#titulo_organograma' => $organograma->titulo,
         '#attached' => [
           'library' => [
             'mikedelta_organogramas/treant',
+            'mikedelta_organogramas/organograma_js',
           ],
           'drupalSettings' => [
             'mikeDeltaData' => [
@@ -69,8 +82,8 @@ class OrganogramaController extends ControllerBase {
           ],
         ],
         '#cache' => [
-          'tags' => ['mikedelta_organograma:view'],
-          'contexts' => ['user.roles:authenticated'],
+          'contexts' => ['url.path', 'user.roles:authenticated'],
+          'tags' => ['mikedelta_organogramas_membros'],
         ],
       ],
     ];

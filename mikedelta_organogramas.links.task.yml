@@ -1,17 +1,11 @@
 mikedelta_organogramas.admin_list_tab:
   route_name: mikedelta_organogramas.admin_list
-  title: "Listar Membros"
+  title: "Membros do Organograma"
   base_route: mikedelta_organogramas.admin_list
   weight: 10
 
 mikedelta_organogramas.admin_add_tab:
   route_name: mikedelta_organogramas.admin_add
-  title: "Adicionar Membro"
+  title: "Adicionar Novo Membro"
   base_route: mikedelta_organogramas.admin_list
   weight: 20
-
-mikedelta_organogramas.backup_restore_tab:
-  route_name: mikedelta_organogramas.backup_restore
-  title: "Backup/Restore"
-  base_route: mikedelta_organogramas.admin_list
-  weight: 30

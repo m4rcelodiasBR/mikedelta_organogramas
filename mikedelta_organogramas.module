@@ -16,6 +16,9 @@ function mikedelta_organogramas_theme() {
       'variables' => [
         'dados_membros' => NULL,
         'dados_organograma' => NULL,
+        'organograma_dados' => NULL,
+        'titulo_organograma' => NULL,
+        'is_admin' => FALSE
       ],
       'template' => 'organograma-page',
     ],
@@ -28,17 +31,39 @@ function mikedelta_organogramas_theme() {
 function mikedelta_organogramas_help($route_name, RouteMatchInterface $route_match) {
   switch ($route_name) {
     case 'help.page.mikedelta_organogramas':
-      $output = '<h3>' . t('Sobre o MikeDelta Organogramas') . '</h3>';
-      $output .= '<p>' . t('O módulo MikeDelta Organogramas permite a criação e o gerenciamento de organogramas hierárquicos de forma responsiva e com renderização 100% offline (ideal para intranets isoladas).') . '</p>';
-      $output .= '<h3>' . t('Como utilizar') . '</h3>';
-      $output .= '<dl>';
-      $output .= '<dt>' . t('1. Cadastrar Membros') . '</dt>';
-      $output .= '<dd>' . t('Acesse <em>Estrutura > Organograma > Adicionar Membro</em>. Preencha os dados rigorosamente conforme as máscaras (ex: RETELMA 0000-0000). Você pode definir as cores do cartão utilizando a paleta de cores HTML5.') . '</dd>';
-      $output .= '<dt>' . t('2. Definir Hierarquia (Drag n Drop)') . '</dt>';
-      $output .= '<dd>' . t('Acesse a aba <em>Listar Membros</em>. Utilize o ícone de cruz ao lado do nome do militar para arrastar a linha. Arraste para a direita para tornar um militar subordinado ao de cima. Arraste para cima/baixo para mudar a ordem de precedência (peso). Clique em Salvar ao final.') . '</dd>';
-      $output .= '<dt>' . t('3. Visualização Pública') . '</dt>';
-      $output .= '<dd>' . t('O organograma é renderizado automaticamente e de forma segura na rota <strong>/md-organograma</strong>.') . '</dd>';
-      $output .= '</dl>';
+      $output = '<h3>' . t('Manual do Sistema MikeDelta Organogramas') . '</h3>';
+      $output .= '<p>' . t('O módulo MikeDelta Organogramas permite a criação e o gerenciamento de organogramas hierárquicos de forma responsiva e com renderização 100% offline (ideal para intranets isoladas)[cite: 5]. Abaixo constam as regras e processos de funcionamento do sistema.') . '</p>';
+      
+      $output .= '<h4>' . t('1. Estrutura e Criação') . '</h4>';
+      $output .= '<ul>';
+      $output .= '<li><strong>Múltiplos Organogramas:</strong> O sistema suporta a criação de departamentos infinitos. Cada organograma possui sua própria URL gerada através do campo "Slug".</li>';
+      $output .= '<li><strong>URLs Únicas:</strong> Não é permitido o uso de acentos, espaços ou caracteres especiais no Slug. O sistema fará a limpeza automática ao salvar.</li>';
+      $output .= '</ul>';
+
+      $output .= '<h4>' . t('2. Gestão de Membros (Militares/Servidores)') . '</h4>';
+      $output .= '<ul>';
+      $output .= '<li><strong>Limites de Imagem:</strong> As fotos enviadas devem estar no formato JPG ou PNG e não podem exceder 1MB de tamanho. O envio é opcional.</li>';
+      $output .= '<li><strong>Campos Obrigatórios e Máscaras:</strong> O Nome de Guerra e o Nome da Função são obrigatórios. O campo RETELMA possui validação restrita e aceita apenas o formato <code>0000-0000</code>.</li>';
+      $output .= '<li><strong>Auto-subordinação:</strong> Ao editar um membro, o sistema bloqueia automaticamente a possibilidade do usuário selecionar ele mesmo como "Superior Imediato", prevenindo loops infinitos na renderização do gráfico.</li>';
+      $output .= '<li><strong>Cores Customizadas:</strong> Os cartões podem ter as cores do fundo, do rodapé e da etiqueta de função alteradas via seletor hexadecimal HTML5, permitindo a diferenciação visual de setores.</li>';
+      $output .= '</ul>';
+
+      $output .= '<h4>' . t('3. Hierarquia e Árvore (Treant.js)') . '</h4>';
+      $output .= '<ul>';
+      $output .= '<li><strong>Drag and Drop:</strong> A montagem do organograma é visual. A árvore obedece estritamente ao recuo na tela de listagem de membros. O militar que estiver no topo e colado à margem esquerda é considerado a raiz do gráfico (ex: Comandante/Diretor).</li>';
+      $output .= '<li><strong>Empilhamento (Stack Children):</strong> Nas configurações visuais do membro, marcar a opção "Empilhar subordinados verticalmente" forçará os filhos diretos deste membro a serem listados em formato de coluna, economizando espaço horizontal na tela para funções de base.</li>';
+      $output .= '</ul>';
+
+      $output .= '<h4>' . t('4. Rotinas de Backup e Restore') . '</h4>';
+      $output .= '<ul>';
+      $output .= '<li><strong>Arquitetura JSON:</strong> O sistema exporta metadados do organograma e os dados tabulares dos membros. Arquivos binários (fotos) são descartados na exportação para garantir a leveza do arquivo.</li>';
+      $output .= '<li><strong>Remapeamento de IDs:</strong> Durante a restauração, os IDs originais do banco de dados antigo são destruídos. O sistema gera novos IDs locais e refaz automaticamente os laços de "Superior Imediato" baseando-se em uma matriz de conversão temporária em memória.</li>';
+      $output .= '<li><strong>Desempenho:</strong> Importações com centenas de membros não sobrecarregam o servidor pois utilizam a Batch API do Drupal (Barra de progresso).</li>';
+      $output .= '</ul>';
+      
+      $output .= '<h4>' . t('5. Resolução de Problemas') . '</h4>';
+      $output .= '<p>' . t('Caso o organograma público não reflita uma alteração recente feita no painel de controle, isso ocorre devido à retenção na memória APCu do servidor. O sistema executa a invalidação automática baseada em tags (<code>mikedelta_organogramas_membros</code>). Caso falhe, rode o comando <code>drush cr</code> no servidor para forçar o descarte dos caches.') . '</p>';
+
       return $output;
   }
 }

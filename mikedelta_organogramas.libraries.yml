@@ -9,5 +9,6 @@ treant:
     assets/js/Treant.js: { weight: -19 }
     assets/js/mikedelta_organogramas.js: {}
   dependencies:
+    - core/drupal
     - core/drupalSettings
     - core/once

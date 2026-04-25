@@ -14,9 +14,11 @@ class OrganogramaListForm extends FormBase {
     return 'mikedelta_organograma_list_form';
   }
 
-  private function getListaArvore($superior_id = NULL, $nivel = 0, &$lista = []) {
+  private function getListaArvore($organograma_id, $superior_id = NULL, $nivel = 0, &$lista = []) {
     $query = Database::getConnection()->select('mikedelta_organograma_membros', 'm')
       ->fields('m');
+
+    $query->condition('organograma_id', $organograma_id);
       
     if ($superior_id === NULL) {
       $query->isNull('superior_id');
@@ -30,35 +32,43 @@ class OrganogramaListForm extends FormBase {
     foreach ($resultados as $linha) {
       $linha->nivel = $nivel;
       $lista[$linha->id] = $linha;
-      // Chama a si mesma para buscar os subordinados deste militar
-      $this->getListaArvore($linha->id, $nivel + 1, $lista);
+      $this->getListaArvore($organograma_id, $linha->id, $nivel + 1, $lista);
     }
 
     return $lista;
   }
 
-  public function buildForm(array $form, FormStateInterface $form_state) {
-    $membros = $this->getListaArvore();
+  public function buildForm(array $form, FormStateInterface $form_state, $organograma_id = NULL) {
+    $conexao = Database::getConnection();
 
-    $form['top_actions'] = [
-      '#type' => 'container',
-      '#attributes' => [
-        'style' => 'display: flex; justify-content: flex-end; gap: 10px; margin-bottom: 20px; border-bottom: 1px solid #ccc; padding-bottom: 10px;',
-      ],
+    $organograma = $conexao->select('mikedelta_organogramas_lista', 'l')
+      ->fields('l')
+      ->condition('id', $organograma_id)
+      ->execute()
+      ->fetchObject();
+
+    if ($organograma) {
+      $form['#title'] = $this->t('Membros: Organograma @titulo', ['@titulo' => $organograma->titulo]);
+    }
+
+    $form['organograma_id'] = [
+      '#type' => 'hidden',
+      '#value' => $organograma_id,
     ];
 
-    $form['top_actions']['view_org'] = [
-      '#type' => 'link',
-      '#title' => 'Ver Organograma',
-      '#url' => Url::fromRoute('mikedelta_organogramas.public_view'),
-      '#attributes' => ['class' => ['button', 'button--primary']],
-    ];
+    $membros = $this->getListaArvore($organograma_id);
 
-    $form['top_actions']['help_org'] = [
-      '#type' => 'link',
-      '#title' => 'Ajuda do Módulo',
-      '#url' => Url::fromRoute('help.page', ['name' => 'mikedelta_organogramas']),
-      '#attributes' => ['class' => ['button']],
+    $form['instrucoes_drag'] = [
+      '#markup' => '<div style="margin-bottom: 20px;">
+        <p>Esta seção é destinada a organizar a hierarquia do organograma. Você pode arrastar e soltar os membros para definir quem é subordinado a quem e a ordem de exibição.</p>
+        <p><strong>Instruções:</strong></p>
+        <ul style="margin-top: 5px;">
+          <li>Utilize o ícone de cruz direcional <span style="font-size: 1.2em;">☩</span> ao lado do nome para mover os membros.</li>
+          <li><strong>Mudar Ordem (Peso):</strong> Arraste para cima ou para baixo para alterar quem aparece primeiro na mesma linha.</li>
+          <li><strong>Subordinação:</strong> Arraste o militar para a <strong>direita</strong>, colocando-o logo abaixo do seu chefe imediato. O recuo visual confirmará a subordinação.</li>
+        </ul>
+        <p><em>Nota: Não se esqueça de clicar em "Salvar Nova Ordem e Hierarquia" no final da página para aplicar as mudanças!</em></p>
+      </div>',
     ];
 
     $form['membros'] = [
@@ -145,25 +155,36 @@ class OrganogramaListForm extends FormBase {
         '#links' => [
           'edit' => [
             'title' => $this->t('Editar'),
-            'url' => Url::fromRoute('mikedelta_organogramas.admin_edit', ['id' => $id]),
+            'url' => Url::fromRoute('mikedelta_organogramas.admin_edit', ['organograma_id' => $organograma_id, 'id' => $id]),
           ],
           'delete' => [
             'title' => $this->t('Excluir'),
-            'url' => Url::fromRoute('mikedelta_organogramas.admin_delete', ['id' => $id]),
+            'url' => Url::fromRoute('mikedelta_organogramas.admin_delete', ['organograma_id' => $organograma_id, 'id' => $id]),
           ],
         ],
       ];
     }
 
-    // Só exibe o botão de salvar se houver membros
+
+    $form['actions'] = [
+      '#type' => 'actions',
+      '#attributes' => ['style' => 'display: flex; gap: 10px; align-items: center; margin-top: 20px;'],
+    ];
+
     if (!empty($membros)) {
-      $form['actions'] = ['#type' => 'actions'];
       $form['actions']['submit'] = [
         '#type' => 'submit',
         '#value' => $this->t('Salvar Nova Ordem e Hierarquia'),
         '#button_type' => 'primary',
       ];
     }
+
+    $form['actions']['voltar'] = [
+      '#type' => 'link',
+      '#title' => $this->t('Voltar'),
+      '#url' => Url::fromRoute('mikedelta_organogramas.dashboard'),
+      '#attributes' => ['class' => ['button']],
+    ];
 
     return $form;
   }

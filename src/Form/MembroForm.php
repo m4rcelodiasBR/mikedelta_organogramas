@@ -17,8 +17,8 @@ class MembroForm extends FormBase {
     return 'mikedelta_organograma_membro_form';
   }
 
-  public function buildForm(array $form, FormStateInterface $form_state, $id = NULL) {
-    // Busca no banco de dados para popular o campo "Superior Imediato"
+  public function buildForm(array $form, FormStateInterface $form_state, $organograma_id = NULL, $id = NULL) {
+
     $this->membroId = $id;
     $membro = NULL;
     $conexao = Database::getConnection();
@@ -29,10 +29,26 @@ class MembroForm extends FormBase {
         ->condition('id', $id)
         ->execute()
         ->fetchObject();
+        $organograma_id = $membro->organograma_id;
+    }
+
+    if ($organograma_id) {
+      $organograma = $conexao->select('mikedelta_organogramas_lista', 'l')
+        ->fields('l')
+        ->condition('id', $organograma_id)
+        ->execute()
+        ->fetchObject();
+
+      if ($organograma) {
+        $prefixo = $id ? $this->t('Editar Membro') : $this->t('Adicionar Membro');
+        $form['#title'] = $prefixo . ': Organograma ' . $organograma->titulo;
+      }
     }
     
     $query = $conexao->select('mikedelta_organograma_membros', 'm');
     $query->fields('m', ['id', 'nome', 'titulo_cargo']);
+    $query->condition('organograma_id', $organograma_id);
+    
     if ($id) {
       $query->condition('id', $id, '<>');
     }
@@ -44,30 +60,25 @@ class MembroForm extends FormBase {
       $opcoes_superiores[$row->id] = $row->titulo_cargo . ' ' . $row->nome;
     }
 
-    $form['top_actions'] = [
-      '#type' => 'container',
-      '#attributes' => [
-        'style' => 'display: flex; justify-content: flex-end; gap: 10px; margin-bottom: 20px; border-bottom: 1px solid #ccc; padding-bottom: 10px;',
-      ],
+    $form['id'] = [
+      '#type' => 'hidden',
+      '#value' => $id,
+    ];
+    
+    $form['organograma_id'] = [
+      '#type' => 'hidden',
+      '#value' => $organograma_id,
     ];
 
-    $form['top_actions']['view_org'] = [
-      '#type' => 'link',
-      '#title' => 'Ver Organograma',
-      '#url' => Url::fromRoute('mikedelta_organogramas.public_view'),
-      '#attributes' => ['class' => ['button', 'button--primary']],
+
+
+    $form['aba_dados'] = [
+      '#type' => 'details',
+      '#title' => $this->t('1) Dados do Membro'),
+      '#open' => TRUE,
     ];
 
-    $form['top_actions']['help_org'] = [
-      '#type' => 'link',
-      '#title' => 'Ajuda do Módulo',
-      '#url' => Url::fromRoute('help.page', ['name' => 'mikedelta_organogramas']),
-      '#attributes' => ['class' => ['button']],
-    ];
-
-    $form['#tree'] = TRUE;
-
-    $form['foto_fid'] = [
+    $form['aba_dados']['foto_fid'] = [
       '#type' => 'managed_file',
       '#title' => $this->t('Foto'),
       '#description' => $this->t('Tamanho máximo: 1MB. Formatos permitidos: png jpg jpeg.'),
@@ -79,108 +90,151 @@ class MembroForm extends FormBase {
       '#default_value' => $membro && $membro->foto_fid ? [$membro->foto_fid] : [],
     ];
 
-    $form['codigo_funcao'] = [
-      '#type' => 'textfield',
-      '#title' => $this->t('Código da Função'),
-      '#maxlength' => 30,
-      '#description' => $this->t('Ex: CPO-01, MD-03, SSPM-01.2. Pode ser deixado em branco se a função não possuir código.'),
-      '#required' => FALSE,
-      '#default_value' => $membro ? $membro->codigo_funcao : '',
+    $form['aba_dados']['linha_nome'] = [
+      '#type' => 'container',
+      '#attributes' => ['style' => 'display: flex; gap: 20px;'],
     ];
-
-    $form['cores_codigo_funcao'] = [
-      '#type' => 'details',
-      '#title' => $this->t('Personalização do Código da Função (Tag)'),
-      '#open' => FALSE,
-    ];
-
-    $form['cores_codigo_funcao']['cor_fundo'] = [
-      '#type' => 'color',
-      '#title' => $this->t('Cor de Fundo Função (Tag)'),
-      '#default_value' => $membro ? $membro->codigo_funcao_bgcolor : '#0284c7',
-    ];
-
-    $form['cores_codigo_funcao']['cor_texto'] = [
-      '#type' => 'color',
-      '#title' => $this->t('Cor do Texto Função (Tag)'),
-      '#default_value' => $membro ? $membro->codigo_funcao_color : '#ffffff',
-    ];
-
-    $form['nome_funcao'] = [
-      '#type' => 'textfield',
-      '#title' => $this->t('Nome da Função/Setor'),
-      '#maxlength' => 50,
-      '#description' => $this->t('Ex: Assessor do Secretário, Ajudante para Sistemas.'),
-      '#required' => TRUE,
-      '#default_value' => $membro ? $membro->nome_funcao : '',
-    ];
-
-    $form['titulo_cargo'] = [
+    
+    $form['aba_dados']['linha_nome']['titulo_cargo'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Título, Cargo ou Posto/Quadro'),
       '#maxlength' => 20,
       '#description' => $this->t('Ex: CF(IM), 1T(AA), Diretor, Gerente.'),
       '#required' => FALSE,
       '#default_value' => $membro ? $membro->titulo_cargo : '',
+      '#attributes' => ['style' => 'flex: 1;'],
     ];
 
-    $form['nome'] = [
+    $form['aba_dados']['linha_nome']['nome'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Nome do Membro'),
       '#maxlength' => 50,
       '#required' => FALSE,
       '#default_value' => $membro ? $membro->nome : '',
+      '#attributes' => ['style' => 'flex: 3;'],
     ];
 
-    $form['retelma'] = [
+    $form['aba_dados']['linha_contato'] = [
+      '#type' => 'container',
+      '#attributes' => ['style' => 'display: flex; gap: 20px;'],
+    ];
+
+    $form['aba_dados']['linha_contato']['retelma'] = [
       '#type' => 'textfield',
-      '#title' => $this->t('RETELMA'),
+      '#title' => $this->t('Telefone/RETELMA'),
       '#maxlength' => 9,
       '#description' => $this->t('Formato obrigatório: 0000-0000'),
       '#required' => FALSE,
       '#default_value' => $membro ? $membro->retelma : '',
+      '#attributes' => ['style' => 'flex: 1;'],
     ];
 
-    $form['email'] = [
+    $form['aba_dados']['linha_contato']['email'] = [
       '#type' => 'email',
-      '#title' => $this->t('E-mail'),
+      '#title' => $this->t('E-mail (Opcional)'),
       '#maxlength' => 100,
-      '#description' => $this->t('Endereço de e-mail válido. Opcional.'),
+      '#description' => $this->t('Endereço de e-mail válido.'),
       '#default_value' => $membro ? $membro->email : '',
+      '#attributes' => ['style' => 'flex: 1;'],
     ];
 
-    $form['cor_principal'] = [
-      '#type' => 'color',
-      '#title' => $this->t('Cor Primária do Cartão'),
-      '#default_value' => $membro ? $membro->cor_principal : '#0f172a',
+
+
+    $form['aba_funcao'] = [
+      '#type' => 'details',
+      '#title' => $this->t('2) Função e Hierarquia'),
+      '#open' => TRUE,
     ];
 
-    $form['cor_secundaria'] = [
-      '#type' => 'color',
-      '#title' => $this->t('Cor Secundária do Cartão'),
-      '#description' => $this->t('Para uma cor sólida, escolha a mesma cor selecionada acima.'),
-      '#default_value' => $membro ? $membro->cor_secundaria : '#1e293b',
+    $form['aba_funcao']['linha_funcao'] = [
+      '#type' => 'container',
+      '#attributes' => ['style' => 'display: flex; gap: 20px;'],
     ];
 
-    $form['superior_id'] = [
+    $form['aba_funcao']['linha_funcao']['nome_funcao'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Nome da Função/Setor'),
+      '#maxlength' => 50,
+      '#description' => $this->t('Ex: Assessor do Secretário, Ajudante para Sistemas.'),
+      '#required' => TRUE,
+      '#default_value' => $membro ? $membro->nome_funcao : '',
+      '#attributes' => ['style' => 'flex: 3;'],
+    ];
+
+    $form['aba_funcao']['linha_funcao']['codigo_funcao'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Código Função'),
+      '#maxlength' => 30,
+      '#description' => $this->t('Ex: CPO-01, MD-03, SSPM-01.2.'),
+      '#required' => FALSE,
+      '#default_value' => $membro ? $membro->codigo_funcao : '',
+      '#attributes' => ['style' => 'flex: 1;'],
+    ];
+
+    $form['aba_funcao']['superior_id'] = [
       '#type' => 'select',
       '#title' => $this->t('Superior Imediato'),
       '#options' => $opcoes_superiores,
-      '#description' => $this->t('Selecione a quem este membro está subordinado para montar a hierarquia visual.'),
+      '#description' => $this->t('Selecione a quem este membro está subordinado diretamente.'),
       '#default_value' => $membro ? ($membro->superior_id ?: '0') : '0',
     ];
 
-    $form['empilhar_filhos'] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t('Empilhar subordinados verticalmente?'),
-      '#description' => $this->t('Marque se os subordinados diretos desta função deverão aparecer empilhados em formato de lista. Deixe desmarcado para espalhá-los lado a lado.'),
-      '#default_value' => $membro ? $membro->empilhar_filhos : 0,
+
+
+    $form['aba_visual'] = [
+      '#type' => 'details',
+      '#title' => $this->t('3) Configurações Visuais'),
+      '#open' => FALSE,
     ];
 
-    $form['posicao_linha'] = [
+    $form['aba_visual']['linha_cores_cartao'] = [
+      '#type' => 'container',
+      '#attributes' => ['style' => 'display: flex; gap: 20px;'],
+    ];
+
+    $form['aba_visual']['linha_cores_cartao']['cor_principal'] = [
+      '#type' => 'color',
+      '#title' => $this->t('Cor Primária do Cartão'),
+      '#default_value' => $membro ? $membro->cor_principal : '#0f172a',
+      '#attributes' => ['style' => 'flex: 1;'],
+    ];
+
+    $form['aba_visual']['linha_cores_cartao']['cor_secundaria'] = [
+      '#type' => 'color',
+      '#title' => $this->t('Cor Secundária do Cartão'),
+      '#description' => $this->t('Para cor sólida, escolha a mesma da primária.'),
+      '#default_value' => $membro ? $membro->cor_secundaria : '#1e293b',
+      '#attributes' => ['style' => 'flex: 1;'],
+    ];
+
+    $form['aba_visual']['linha_cores_tag'] = [
+      '#type' => 'container',
+      '#attributes' => ['style' => 'display: flex; gap: 20px;'],
+    ];
+
+    $form['aba_visual']['linha_cores_tag']['codigo_funcao_bgcolor'] = [
+      '#type' => 'color',
+      '#title' => $this->t('Cor de Fundo da Tag (Código)'),
+      '#default_value' => $membro ? $membro->codigo_funcao_bgcolor : '#0284c7',
+      '#attributes' => ['style' => 'flex: 1;'],
+    ];
+
+    $form['aba_visual']['linha_cores_tag']['codigo_funcao_color'] = [
+      '#type' => 'color',
+      '#title' => $this->t('Cor do Texto da Tag (Código)'),
+      '#default_value' => $membro ? $membro->codigo_funcao_color : '#ffffff',
+      '#attributes' => ['style' => 'flex: 1;'],
+    ];
+
+    $form['aba_visual']['linha_layout'] = [
+      '#type' => 'container',
+      '#attributes' => ['style' => 'display: flex; gap: 20px;'],
+    ];
+
+    $form['aba_visual']['linha_layout']['posicao_linha'] = [
       '#type' => 'select',
-      '#title' => $this->t('Ponto de Saída da Linha (Subordinados)'),
-      '#description' => $this->t('Escolha entre as cinco posições para a linha que conecta aos subordinados.'),
+      '#title' => $this->t('Ponto de Saída da Linha'),
+      '#description' => $this->t('Escolha o alinhamento da linha dos subordinados.'),
       '#options' => [
         1 => $this->t('Posição 1 (Esquerda)'),
         2 => $this->t('Posição 2 (Centro-Esquerda)'),
@@ -189,9 +243,23 @@ class MembroForm extends FormBase {
         5 => $this->t('Posição 5 (Direita)'),
       ],
       '#default_value' => $membro ? $membro->posicao_linha : 3,
+      '#attributes' => ['style' => 'flex: 1;'],
     ];
 
-    $form['actions']['#type'] = 'actions';
+    $form['aba_visual']['linha_layout']['empilhar_filhos'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Empilhar subordinados verticalmente?'),
+      '#description' => $this->t('Marque para exibir os subordinados em formato de lista.'),
+      '#default_value' => $membro ? $membro->empilhar_filhos : 0,
+      '#attributes' => ['style' => 'flex: 1; align-self: flex-end; padding-bottom: 20px;'],
+    ];
+
+
+    
+    $form['actions'] = [
+      '#type' => 'actions',
+      '#attributes' => ['style' => 'display: flex; gap: 10px; align-items: center;'],
+    ];
     $form['actions']['submit'] = [
       '#type' => 'submit',
       '#value' => $this->t('Salvar'),
@@ -201,6 +269,12 @@ class MembroForm extends FormBase {
       '#type' => 'submit',
       '#value' => $this->t('Salvar e Adicionar Novo'),
       '#name' => 'save_and_new',
+    ];
+    $form['actions']['voltar'] = [
+      '#type' => 'link',
+      '#title' => $this->t('Voltar'),
+      '#url' => Url::fromRoute('mikedelta_organogramas.admin_list', ['organograma_id' => $organograma_id]),
+      '#attributes' => ['class' => ['button']],
     ];
 
     return $form;
@@ -224,11 +298,9 @@ class MembroForm extends FormBase {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $valores = $form_state->getValues();
     
-    // Tratamento do ID do arquivo (Foto)
     $foto_fid = 0;
     if (!empty($valores['foto_fid'][0])) {
       $foto_fid = $valores['foto_fid'][0];
-      // Torna o arquivo permanente no sistema do Drupal
       $file = File::load($foto_fid);
       if ($file) {
         $file->setPermanent();
@@ -248,6 +320,7 @@ class MembroForm extends FormBase {
       'email' => $valores['email'],
       'cor_principal' => $valores['cor_principal'],
       'cor_secundaria' => $valores['cor_secundaria'],
+      'organograma_id' => $valores['organograma_id'],
       'superior_id' => $valores['superior_id'] == '0' ? NULL : $valores['superior_id'],
       'posicao_linha' => $valores['posicao_linha'],
       'empilhar_filhos' => $valores['empilhar_filhos'],
@@ -271,9 +344,9 @@ class MembroForm extends FormBase {
 
       $botao_clicado = $form_state->getTriggeringElement()['#name'];
       if ($botao_clicado === 'save_and_new') {
-        $form_state->setRedirect('mikedelta_organogramas.admin_add');
+        $form_state->setRedirect('mikedelta_organogramas.admin_add', ['organograma_id' => $valores['organograma_id']]);
       } else {
-        $form_state->setRedirect('mikedelta_organogramas.admin_list');
+        $form_state->setRedirect('mikedelta_organogramas.admin_list', ['organograma_id' => $valores['organograma_id']]);
       }
     } 
     catch (\Exception $e) {
