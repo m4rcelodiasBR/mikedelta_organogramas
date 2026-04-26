@@ -108,9 +108,9 @@ class MembroForm extends FormBase {
     
     $form['aba_dados']['linha_nome']['titulo_cargo'] = [
       '#type' => 'textfield',
-      '#title' => $this->t('Título, Cargo ou Posto/Quadro'),
+      '#title' => $this->t('Título/Cargo ou Posto(Quadro)/Grad(Espec)'),
       '#maxlength' => 20,
-      '#description' => $this->t('Ex: CF(IM), 1T(AA), Diretor, Gerente.'),
+      '#description' => $this->t('Exs.: Diretor, Gerente, CF (T), 1T (AA), 1SG (PD).'),
       '#required' => FALSE,
       '#default_value' => $membro ? $membro->titulo_cargo : '',
       '#attributes' => ['style' => 'flex: 1;'],
@@ -166,7 +166,7 @@ class MembroForm extends FormBase {
       '#type' => 'textfield',
       '#title' => $this->t('Nome da Função/Setor'),
       '#maxlength' => 50,
-      '#description' => $this->t('Ex: Assessor do Secretário, Ajudante para Sistemas.'),
+      '#description' => $this->t('Exs.: Assessor do Comandante, Ajudante para Sistemas, Secretaria.'),
       '#required' => TRUE,
       '#default_value' => $membro ? $membro->nome_funcao : '',
       '#attributes' => ['style' => 'flex: 3;'],
@@ -176,7 +176,7 @@ class MembroForm extends FormBase {
       '#type' => 'textfield',
       '#title' => $this->t('Código Função'),
       '#maxlength' => 30,
-      '#description' => $this->t('Ex: CPO-01, MD-03, SSPM-01.2.'),
+      '#description' => $this->t('Exs.: CPO-01, MD-03, SSPM-01.2, TI-11.'),
       '#required' => FALSE,
       '#default_value' => $membro ? $membro->codigo_funcao : '',
       '#attributes' => ['style' => 'flex: 1;'],
@@ -205,14 +205,14 @@ class MembroForm extends FormBase {
 
     $form['aba_visual']['linha_cores_cartao']['cor_principal'] = [
       '#type' => 'color',
-      '#title' => $this->t('Cor Primária do Cartão'),
+      '#title' => $this->t('Cor Primária do Cartão de Membro'),
       '#default_value' => $membro ? $membro->cor_principal : ($ultimo_estilo['cor_principal'] ?? '#0f172a'),
       '#attributes' => ['style' => 'flex: 1;'],
     ];
 
     $form['aba_visual']['linha_cores_cartao']['cor_secundaria'] = [
       '#type' => 'color',
-      '#title' => $this->t('Cor Secundária do Cartão'),
+      '#title' => $this->t('Cor Secundária do Cartão de Membro'),
       '#description' => $this->t('Para cor sólida, escolha a mesma da primária.'),
       '#default_value' => $membro ? $membro->cor_secundaria : ($ultimo_estilo['cor_secundaria'] ?? '#1e293b'),
       '#attributes' => ['style' => 'flex: 1;'],
@@ -245,7 +245,7 @@ class MembroForm extends FormBase {
     $form['aba_visual']['linha_layout']['posicao_linha'] = [
       '#type' => 'select',
       '#title' => $this->t('Ponto de Saída da Linha'),
-      '#description' => $this->t('Escolha o alinhamento da linha dos subordinados.'),
+      '#description' => $this->t('Escolha o alinhamento da linha dos subordinados (Quando aplicável).'),
       '#options' => [
         1 => $this->t('Posição 1 (Esquerda)'),
         2 => $this->t('Posição 2 (Centro-Esquerda)'),
