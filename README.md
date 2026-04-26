@@ -45,8 +45,8 @@ Um módulo nativo para Drupal 10/11 desenhado para a criação, gestão e exibi�
 
 ## 🖥️ Downloads
 
-- [mikedelta_organogramas-1.0.0.zip](https://github.com/m4rcelodiasBR/mikedelta_organogramas/archive/refs/tags/v1.1.0.zip)
-- [mikedelta_organogramas-1.0.0.tar.gz](https://github.com/m4rcelodiasBR/mikedelta_organogramas/archive/refs/tags/v1.1.0.tar.gz)
+- [mikedelta_organogramas-1.0.0.zip](https://github.com/m4rcelodiasBR/mikedelta_organogramas/archive/refs/tags/v1.0.0.zip)
+- [mikedelta_organogramas-1.0.0.tar.gz](https://github.com/m4rcelodiasBR/mikedelta_organogramas/archive/refs/tags/v1.0.0.tar.gz)
 
 ---
 *Desenvolvido sob arquitetura MVC adaptada para o ecosistema Drupal.*
