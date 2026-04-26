@@ -1,4 +1,4 @@
-# Mike Delta Organogramas
+# MikeDelta Organogramas
 
 Um módulo nativo para Drupal 10/11 desenhado para a criação, gestão e exibição visual de organogramas dinâmicos. Criado com foco em ambientes corporativos e de intranet restrita da Marinha do Brasil (RECIM), o módulo opera de forma **100% offline**, não dependendo de conexões com a internet externa ou CDNs para renderizar os gráficos ou exportar os documentos. Este Módulo foi desenvolvido por Marcelo Dias da Silva
 
