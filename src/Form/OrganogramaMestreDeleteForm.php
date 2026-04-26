@@ -66,6 +66,10 @@ class OrganogramaMestreDeleteForm extends ConfirmFormBase {
       ->execute();
 
     \Drupal::messenger()->addStatus($this->t('Organograma e todos os seus vínculos foram destruídos com sucesso.'));
+    \Drupal::logger('mikedelta_organogramas')->info('O usuário @user EXCLUIU o organograma "@titulo" e todos os seus membros.', [
+      '@user' => \Drupal::currentUser()->getAccountName(),
+      '@titulo' => $this->organograma->titulo,
+    ]);
     $form_state->setRedirectUrl($this->getCancelUrl());
   }
 }

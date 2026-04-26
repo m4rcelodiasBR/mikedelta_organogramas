@@ -73,7 +73,6 @@ class OrganogramaController extends ControllerBase {
         '#attached' => [
           'library' => [
             'mikedelta_organogramas/treant',
-            'mikedelta_organogramas/organograma_js',
           ],
           'drupalSettings' => [
             'mikeDeltaData' => [

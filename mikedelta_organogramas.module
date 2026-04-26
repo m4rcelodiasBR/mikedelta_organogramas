@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Arquivo principal do módulo MikeDelta Organogramas.
- */
-
 use Drupal\Core\Routing\RouteMatchInterface;
 
 /**
@@ -31,38 +26,74 @@ function mikedelta_organogramas_theme() {
 function mikedelta_organogramas_help($route_name, RouteMatchInterface $route_match) {
   switch ($route_name) {
     case 'help.page.mikedelta_organogramas':
-      $output = '<h3>' . t('Manual do Sistema MikeDelta Organogramas') . '</h3>';
-      $output .= '<p>' . t('O módulo MikeDelta Organogramas permite a criação e o gerenciamento de organogramas hierárquicos de forma responsiva e com renderização 100% offline (ideal para intranets isoladas)[cite: 5]. Abaixo constam as regras e processos de funcionamento do sistema.') . '</p>';
+
+      $output .= '<h4>' . t('Sobre o Módulo MikeDelta Organogramas') . '</h4>';
+      $output .= '<p><strong>' . t('Versão:') . '</strong> 1.0.0 <em>(Build: Maio/2026)</em><br>';
+      $output .= '<strong>' . t('Desenvolvedor:') . '</strong> Marcelo Dias da Silva.</p>';
+      $output .= '<p>' . t('Este módulo foi desenvolvido para facilitar a gestão e a visualização da estrutura administrativa de uma organização. Ele permite que você crie mapas visuais (árvores hierárquicas) que mostram claramente a relação de subordinação entre os membros, divisões e departamentos. Com esta ferramenta, é possível transformar uma lista de nomes em um gráfico interativo, organizado e de fácil compreensão para todos os usuários.') . '</p>';
+
+      $output .= '<h4>' . t('1. Gerenciamento de Organogramas') . '</h4>';
+      $output .= '<p>' . t('Antes de cadastrar os membros, você precisa criar o "contêiner" da organização/departamento. Cada organograma criado funciona de forma independente, permitindo que tenha mapas separados para diversos departamentos, setores ou divisões. Cada um terá seu próprio nome e um endereço (rota) exclusivo.') . '</p>';
       
-      $output .= '<h4>' . t('1. Estrutura e Criação') . '</h4>';
+      $output .= '<strong>' . t('Instruções:') . '</strong>';
+      $output .= '<ol>';
+      $output .= '<li>' . t('No menu superior, vá em <strong>Estrutura > Organogramas (MikeDelta) > Gerenciar </strong>.') . '</li>';
+      $output .= '<li>' . t('Clique no botão <strong>Criar Novo Organograma</strong>.') . '</li>';
+      $output .= '<li>' . t('<strong>Título:</strong> Digite o nome completo do setor (ex.: Centro de TI). O título aqui definirá o endereço de acesso (ex.: centro-de-ti).') . '</li>';
+      $output .= '<li>' . t('<strong>Descrição:</strong> Utilize este campo para descrever o organograma com notas ou observações pertinentes.') . '</li>';
+      $output .= '<li>' . t('Clique em <strong>Salvar</strong>.') . '</li>';
+      $output .= '</ol>';
+      $output .= '<p>' . t('Após salvar, você será redirecionado para a lista de Organogramas.') . '</p>';
+
+      $output .= '<h4>' . t('2. Cadastro de Membros e Funções') . '</h4>';
+      $output .= '<p>' . t('Aqui é onde você insere os membros relacionados aos organogramas criados. O cadastro é dividido em seções para facilitar o preenchimento. Além dos dados pessoais, você define o cargo que a pessoa ocupa e a quem ela responde diretamente. Por fim, ao final você personaliza o visual deste membro. Cada membro poderá ser personalizado de forma exclusiva. <em>Sugestão:</em> Separe os níveis por cores.') . '</p>';
+
+      $output .= '<strong>' . t('Instruções:') . '</strong>';
+      $output .= '<ol>';
+      $output .= '<li>' . t('No Dashboard, localize o organograma da organização criado e clique no seu respectivo botão <strong>Membros</strong>.') . '</li>';
+      $output .= '<li>' . t('Clique na aba acima <strong>Adicionar Membro</strong>.') . '</li>';
+      $output .= '<li>' . t('Na seção <strong>Dados do Membro</strong>, preencha a identificação básica e anexe uma foto se aplicável.') . '</li>';
+      $output .= '<li>' . t('Na seção <strong>Função e Hierarquia</strong>, descreva o cargo e selecione o seu Superior Imediato.') . '</li>';
+      $output .= '<li>' . t('Na seção <strong>Configurações visuais</strong>, personalize como o cartão do membro será exibido, como cores do cartão, da tag de código função, alinhamento da ramificação e posição de seus subordinados (quando aplicável).') . '</li>';
+      $output .= '<li>' . t('Clique em <strong>Salvar</strong> para incluir o membro e voltar para lista de membros ou <strong>Salvar e adicionar novo</strong> para salvar e logo adicionar um novo membro.') . '</li>';
+      $output .= '</ol>';
+      $output .= '<p><em><strong>IMPORTANTE:</strong> A foto deve estar no formato JPG, JPEG ou PNG e ter no máximo 1MB. O telefone (RETELMA) deve seguir obrigatoriamente o padrão 0000-0000.</em></p>';
+
+      $output .= '<h4>' . t('3. Organização Visual e Hierárquica') . '</h4>';
+      $output .= '<p>' . t('Apenas cadastrar os membros não desenha o gráfico. Você precisa organizar a "árvore" movendo os nomes. O sistema utiliza uma lógica de indentação: quanto mais para a direita um nome estiver em relação ao de cima, mais baixo ele estará na escala hierárquica.') . '</p>';
+
+      $output .= '<strong>' . t('Instruções:') . '</strong>';
+      $output .= '<ol>';
+      $output .= '<li>' . t('Na lista de membros, utilize o ícone ☩ para arrastar as linhas.') . '</li>';
+      $output .= '<li>' . t('Para definir um subordinado, arraste o nome dele para baixo do chefe e depois <strong>mova para a direita</strong>.') . '</li>';
+      $output .= '<li>' . t('Se quiser que os subordinados apareçam em lista (um abaixo do outro) para economizar espaço, edite o membro chefe e marque "Empilhar subordinados" na aba de configurações visuais.') . '</li>';
+      $output .= '<li>' . t('<strong>Atenção:</strong> Sempre clique em <strong>Salvar Nova Ordem e Hierarquia</strong> após qualquer movimento para consolidar as mudanças.') . '</li>';
+      $output .= '<li>' . t('<strong>Importante:</strong> As hierarquias são definidas também ao adicionar/editar membros.') . '</li>';
+      $output .= '</ol>';
+
+      $output .= '<h4>' . t('4. Salvaguarda de Dados (Backup)') . '</h4>';
+      $output .= '<p>' . t('Esta seção é vital para evitar a perda de trabalho. O backup gera um arquivo contendo toda a estrutura que você montou. Se o servidor der problema ou se você precisar mover o organograma para outra máquina, basta usar esse arquivo.') . '</p>';
+
+      $output .= '<strong>' . t('Instruções:') . '</strong>';
       $output .= '<ul>';
-      $output .= '<li><strong>Múltiplos Organogramas:</strong> O sistema suporta a criação de departamentos infinitos. Cada organograma possui sua própria URL gerada através do campo "Slug".</li>';
-      $output .= '<li><strong>URLs Únicas:</strong> Não é permitido o uso de acentos, espaços ou caracteres especiais no Slug. O sistema fará a limpeza automática ao salvar.</li>';
+      $output .= '<li>' . t('Para salvar tudo, vá em <strong>Backup/Restore</strong>. Na seção <em>Exportar Dados</em>, clique em <strong>Gerar Backup Global (.json)</strong>. Será gerado o arquivo para download contendo todos os organogramas do sistema.') . '</li>';
+      $output .= '<li>' . t('Para restaurar, vá em <strong>Backup/Restore</strong>. N aseção <em>Importar Dados</em>, selecione o arquivo salvo no seu computador e clique em <strong>Restaurar Backup (.json)</strong>.') . '</li>';
+      $output .= '<li>' . t('Aguarde todo o processo de importação (restore) até o final.') . '</li>';
+      $output .= '</ul>';
+      $output .= '<p><em><strong>Importante:</strong> Os arquivos aceitos são exclusivamente no formato JSON e, por questões de espaço, os backups não salvam as fotos. Elas precisam ser anexadas novamente nos cadastros dos membros caso você faça uma restauração em um sistema do zero.</em></p>';
+
+      $output .= '<h4>' . t('5. Visão pública do Organograma') . '</h4>';
+      $output .= '<p>' . t('Uma vez que a estrutura está pronta e salva, ela pode ser acessada a qualquer momento. O link direto é gerado automaticamente pelo sistema. Utilize a rota criada na lista de organograma para usá-lo em um hiperlink ou botão em seu site.') . '</p>';
+      $output .= '<ul>';
+      $output .= '<li>' . t('No Dashboard, utilize o botão <strong>Visualizar</strong> para obter o link da página pública.') . '</li>';
+      $output .= '<li>' . t('Você pode copiar este link e colocá-lo no menu principal do seu portal ou Intranet.') . '</li>';
       $output .= '</ul>';
 
-      $output .= '<h4>' . t('2. Gestão de Membros (Militares/Servidores)') . '</h4>';
-      $output .= '<ul>';
-      $output .= '<li><strong>Limites de Imagem:</strong> As fotos enviadas devem estar no formato JPG ou PNG e não podem exceder 1MB de tamanho. O envio é opcional.</li>';
-      $output .= '<li><strong>Campos Obrigatórios e Máscaras:</strong> O Nome de Guerra e o Nome da Função são obrigatórios. O campo RETELMA possui validação restrita e aceita apenas o formato <code>0000-0000</code>.</li>';
-      $output .= '<li><strong>Auto-subordinação:</strong> Ao editar um membro, o sistema bloqueia automaticamente a possibilidade do usuário selecionar ele mesmo como "Superior Imediato", prevenindo loops infinitos na renderização do gráfico.</li>';
-      $output .= '<li><strong>Cores Customizadas:</strong> Os cartões podem ter as cores do fundo, do rodapé e da etiqueta de função alteradas via seletor hexadecimal HTML5, permitindo a diferenciação visual de setores.</li>';
-      $output .= '</ul>';
-
-      $output .= '<h4>' . t('3. Hierarquia e Árvore (Treant.js)') . '</h4>';
-      $output .= '<ul>';
-      $output .= '<li><strong>Drag and Drop:</strong> A montagem do organograma é visual. A árvore obedece estritamente ao recuo na tela de listagem de membros. O militar que estiver no topo e colado à margem esquerda é considerado a raiz do gráfico (ex: Comandante/Diretor).</li>';
-      $output .= '<li><strong>Empilhamento (Stack Children):</strong> Nas configurações visuais do membro, marcar a opção "Empilhar subordinados verticalmente" forçará os filhos diretos deste membro a serem listados em formato de coluna, economizando espaço horizontal na tela para funções de base.</li>';
-      $output .= '</ul>';
-
-      $output .= '<h4>' . t('4. Rotinas de Backup e Restore') . '</h4>';
-      $output .= '<ul>';
-      $output .= '<li><strong>Arquitetura JSON:</strong> O sistema exporta metadados do organograma e os dados tabulares dos membros. Arquivos binários (fotos) são descartados na exportação para garantir a leveza do arquivo.</li>';
-      $output .= '<li><strong>Remapeamento de IDs:</strong> Durante a restauração, os IDs originais do banco de dados antigo são destruídos. O sistema gera novos IDs locais e refaz automaticamente os laços de "Superior Imediato" baseando-se em uma matriz de conversão temporária em memória.</li>';
-      $output .= '<li><strong>Desempenho:</strong> Importações com centenas de membros não sobrecarregam o servidor pois utilizam a Batch API do Drupal (Barra de progresso).</li>';
-      $output .= '</ul>';
-      
-      $output .= '<h4>' . t('5. Resolução de Problemas') . '</h4>';
-      $output .= '<p>' . t('Caso o organograma público não reflita uma alteração recente feita no painel de controle, isso ocorre devido à retenção na memória APCu do servidor. O sistema executa a invalidação automática baseada em tags (<code>mikedelta_organogramas_membros</code>). Caso falhe, rode o comando <code>drush cr</code> no servidor para forçar o descarte dos caches.') . '</p>';
+      $output .= '<h4>' . t('Feedback e Evolução') . '</h4>';
+      $output .= '<p>' . t('Este módulo foi desenvolvido com foco total na otimização do fluxo de trabalho administrativo, na usabilidade e na conformidade com as normas em vigor. O uso em ambiente de produção é o melhor termômetro para a qualidade de um software.') . '</p>';
+      $output .= '<p>' . t('Caso encontre comportamentos inesperados (bugs), tenha sugestões de novas funcionalidades ou precise relatar melhorias de código, por favor, envie um feedback diretamente ao criador do módulo através do e-mail corporativo:') . '</p>';
+      $output .= '<blockquote><strong>dias.marcelo@marinha.mil.br</strong></blockquote>';
+      $output .= '<p>' . t('Seus relatos são extremamente importantes e servem como combustível para as melhorias e futuras atualizações desta solução.') . '</p>';
 
       return $output;
   }

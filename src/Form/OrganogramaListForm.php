@@ -69,6 +69,7 @@ class OrganogramaListForm extends FormBase {
         </ul>
         <p><em>Nota: Não se esqueça de clicar em "Salvar Nova Ordem e Hierarquia" no final da página para aplicar as mudanças!</em></p>
       </div>',
+      '#weight' => -100,
     ];
 
     $form['membros'] = [
@@ -105,7 +106,6 @@ class OrganogramaListForm extends FormBase {
       $form['membros'][$id]['#attributes']['class'][] = 'draggable';
       $form['membros'][$id]['#weight'] = $membro->peso;
 
-      // Coluna 1: Nome com recuo visual (Indentation) para mostrar subordinação
       $form['membros'][$id]['nome'] = [
         'indentation' => [
           '#theme' => 'indentation',
@@ -116,17 +116,14 @@ class OrganogramaListForm extends FormBase {
         ],
       ];
 
-      // Coluna 2: Função
       $form['membros'][$id]['nome_funcao'] = [
         '#markup' => $membro->nome_funcao,
       ];
 
-      // Coluna 3: CPO-ID
       $form['membros'][$id]['codigo_funcao'] = [
         '#markup' => $membro->codigo_funcao,
       ];
 
-      // Coluna 4: Peso (Oculta visualmente pelo CSS do TableDrag)
       $form['membros'][$id]['peso'] = [
         '#type' => 'weight',
         '#title' => $this->t('Peso para @nome', ['@nome' => $membro->nome]),
@@ -135,21 +132,18 @@ class OrganogramaListForm extends FormBase {
         '#attributes' => ['class' => ['membro-weight']],
       ];
 
-      // Coluna 5: Superior ID (Oculta visualmente, atualizada ao arrastar)
       $form['membros'][$id]['superior_id'] = [
         '#type' => 'textfield',
         '#default_value' => $membro->superior_id ?: 0,
         '#attributes' => ['class' => ['membro-parent']],
       ];
 
-      // Coluna oculta obrigatória para mapear quem é quem no Drag n Drop
       $form['membros'][$id]['id'] = [
         '#type' => 'hidden',
         '#value' => $id,
         '#attributes' => ['class' => ['membro-id']],
       ];
 
-      // Coluna 6: Operações (Editar/Excluir - Criaremos as rotas finais depois)
       $form['membros'][$id]['operacoes'] = [
         '#type' => 'operations',
         '#links' => [
@@ -186,6 +180,9 @@ class OrganogramaListForm extends FormBase {
       '#attributes' => ['class' => ['button']],
     ];
 
+    $form['actions_top'] = $form['actions'];
+    $form['actions_top']['#weight'] = -50;
+
     return $form;
   }
 
@@ -193,7 +190,6 @@ class OrganogramaListForm extends FormBase {
     $valores = $form_state->getValue('membros');
     $conexao = Database::getConnection();
 
-    // Loop rápido e seguro para atualizar o banco de dados conforme o arrasto do usuário
     foreach ($valores as $id => $dados) {
       $superior = ($dados['superior_id'] == 0 || empty($dados['superior_id'])) ? NULL : $dados['superior_id'];
       
@@ -208,5 +204,9 @@ class OrganogramaListForm extends FormBase {
     }
 
     \Drupal::messenger()->addStatus($this->t('A hierarquia e ordem do organograma foram atualizadas.'));
+    \Drupal::logger('mikedelta_organogramas')->info('O usuário @user alterou a subordinação/hierarquia do Organograma ID: @org_id.', [
+      '@user' => \Drupal::currentUser()->getAccountName(),
+      '@org_id' => $form_state->getValue('organograma_id'),
+    ]);
   }
 }

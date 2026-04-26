@@ -100,11 +100,21 @@ class OrganogramaMestreForm extends FormBase {
         ->condition('id', $id)
         ->execute();
       \Drupal::messenger()->addStatus($this->t('Organograma atualizado com sucesso.'));
+      \Drupal::logger('mikedelta_organogramas')->info('O usuário @user @acao o organograma "@titulo".', [
+      '@user' => \Drupal::currentUser()->getAccountName(),
+      '@acao' => 'editou',
+      '@titulo' => $titulo,
+    ]);
     } else {
       $conexao->insert('mikedelta_organogramas_lista')
         ->fields($dados_salvar)
         ->execute();
       \Drupal::messenger()->addStatus($this->t('Novo organograma criado com sucesso! Rota gerada: /md-organograma/@slug', ['@slug' => $slug_final]));
+      \Drupal::logger('mikedelta_organogramas')->info('O usuário @user @acao o organograma "@titulo".', [
+      '@user' => \Drupal::currentUser()->getAccountName(),
+      '@acao' => 'criou',
+      '@titulo' => $titulo,
+    ]);
     }
 
     $form_state->setRedirect('mikedelta_organogramas.dashboard');

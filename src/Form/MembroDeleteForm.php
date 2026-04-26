@@ -20,14 +20,12 @@ class MembroDeleteForm extends ConfirmFormBase {
   }
 
   public function getQuestion() {
-    // Corrigido para os nomes reais das colunas no banco de dados
     return $this->t('Tem certeza que deseja excluir o membro %nome do organograma?', [
       '%nome' => $this->membroDados->titulo_cargo . ' ' . $this->membroDados->nome
     ]);
   }
 
   public function getCancelUrl() {
-    // Injeção do organograma_id obrigatório
     return Url::fromRoute('mikedelta_organogramas.admin_list', ['organograma_id' => $this->organogramaId]);
   }
 
@@ -71,6 +69,11 @@ class MembroDeleteForm extends ConfirmFormBase {
 
     Cache::invalidateTags(['mikedelta_organogramas_membros']);
     \Drupal::messenger()->addStatus($this->t('Membro e ficheiros associados excluídos com sucesso.'));
+    \Drupal::logger('mikedelta_organogramas')->info('O usuário @user EXCLUIU o membro "@nome" do Organograma ID: @org_id.', [
+      '@user' => \Drupal::currentUser()->getAccountName(),
+      '@nome' => $this->membroDados->titulo_cargo . ' ' . $this->membroDados->nome,
+      '@org_id' => $this->organogramaId,
+    ]);
     $form_state->setRedirect('mikedelta_organogramas.admin_list', ['organograma_id' => $this->organogramaId]);
   }
 }

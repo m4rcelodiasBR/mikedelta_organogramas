@@ -60,6 +60,17 @@ class MembroForm extends FormBase {
       $opcoes_superiores[$row->id] = $row->titulo_cargo . ' ' . $row->nome;
     }
 
+    $ultimo_estilo = [];
+    if (!$this->membroId && $organograma_id) {
+      $ultimo_estilo = \Drupal::database()->select('mikedelta_organograma_membros', 'm')
+        ->fields('m', ['cor_principal', 'cor_secundaria', 'codigo_funcao_bgcolor', 'codigo_funcao_color'])
+        ->condition('organograma_id', $organograma_id)
+        ->orderBy('id', 'DESC')
+        ->range(0, 1)
+        ->execute()
+        ->fetchAssoc();
+    }
+
     $form['id'] = [
       '#type' => 'hidden',
       '#value' => $id,
@@ -195,7 +206,7 @@ class MembroForm extends FormBase {
     $form['aba_visual']['linha_cores_cartao']['cor_principal'] = [
       '#type' => 'color',
       '#title' => $this->t('Cor Primária do Cartão'),
-      '#default_value' => $membro ? $membro->cor_principal : '#0f172a',
+      '#default_value' => $membro ? $membro->cor_principal : ($ultimo_estilo['cor_principal'] ?? '#0f172a'),
       '#attributes' => ['style' => 'flex: 1;'],
     ];
 
@@ -203,7 +214,7 @@ class MembroForm extends FormBase {
       '#type' => 'color',
       '#title' => $this->t('Cor Secundária do Cartão'),
       '#description' => $this->t('Para cor sólida, escolha a mesma da primária.'),
-      '#default_value' => $membro ? $membro->cor_secundaria : '#1e293b',
+      '#default_value' => $membro ? $membro->cor_secundaria : ($ultimo_estilo['cor_secundaria'] ?? '#1e293b'),
       '#attributes' => ['style' => 'flex: 1;'],
     ];
 
@@ -215,14 +226,14 @@ class MembroForm extends FormBase {
     $form['aba_visual']['linha_cores_tag']['codigo_funcao_bgcolor'] = [
       '#type' => 'color',
       '#title' => $this->t('Cor de Fundo da Tag (Código)'),
-      '#default_value' => $membro ? $membro->codigo_funcao_bgcolor : '#0284c7',
+      '#default_value' => $membro ? $membro->codigo_funcao_bgcolor : ($ultimo_estilo['codigo_funcao_bgcolor'] ?? '#0284c7'),
       '#attributes' => ['style' => 'flex: 1;'],
     ];
 
     $form['aba_visual']['linha_cores_tag']['codigo_funcao_color'] = [
       '#type' => 'color',
       '#title' => $this->t('Cor do Texto da Tag (Código)'),
-      '#default_value' => $membro ? $membro->codigo_funcao_color : '#ffffff',
+      '#default_value' => $membro ? $membro->codigo_funcao_color : ($ultimo_estilo['codigo_funcao_color'] ?? '#ffffff'),
       '#attributes' => ['style' => 'flex: 1;'],
     ];
 
@@ -255,7 +266,7 @@ class MembroForm extends FormBase {
     ];
 
 
-    
+
     $form['actions'] = [
       '#type' => 'actions',
       '#attributes' => ['style' => 'display: flex; gap: 10px; align-items: center;'],
@@ -277,10 +288,12 @@ class MembroForm extends FormBase {
       '#attributes' => ['class' => ['button']],
     ];
 
+    $form['actions_top'] = $form['actions'];
+    $form['actions_top']['#weight'] = -100;
+
     return $form;
   }
 
-  // Validação rigorosa dos dados antes de salvar (Blindagem)
   public function validateForm(array &$form, FormStateInterface $form_state) {
     $retelma = $form_state->getValue('retelma');
     $email = $form_state->getValue('email');
@@ -294,7 +307,6 @@ class MembroForm extends FormBase {
     }
   }
 
-  // Inserção no banco de dados usando abstração segura
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $valores = $form_state->getValues();
     
@@ -311,8 +323,8 @@ class MembroForm extends FormBase {
     $campos = [
       'foto_fid' => $foto_fid,
       'codigo_funcao' => $valores['codigo_funcao'],
-      'codigo_funcao_bgcolor' => $valores['cores_codigo_funcao']['cor_fundo'],
-      'codigo_funcao_color' => $valores['cores_codigo_funcao']['cor_texto'],
+      'codigo_funcao_bgcolor' => $valores['codigo_funcao_bgcolor'],
+      'codigo_funcao_color' => $valores['codigo_funcao_color'],
       'nome_funcao' => $valores['nome_funcao'],
       'titulo_cargo' => $valores['titulo_cargo'],
       'nome' => $valores['nome'],
@@ -332,15 +344,23 @@ class MembroForm extends FormBase {
           ->fields($campos)
           ->condition('id', $this->membroId)
           ->execute();
-        Cache::invalidateTags(['mikedelta_organograma:view']);
+        Cache::invalidateTags(['mikedelta_organogramas_membros']);
         \Drupal::messenger()->addStatus($this->t('Membro atualizado com sucesso.'));
       } else {
         Database::getConnection()->insert('mikedelta_organograma_membros')
           ->fields($campos)
           ->execute();
-        Cache::invalidateTags(['mikedelta_organograma:view']);
+        Cache::invalidateTags(['mikedelta_organogramas_membros']);
         \Drupal::messenger()->addStatus($this->t('Membro cadastrado com sucesso.'));
       }
+
+      \Drupal::logger('mikedelta_organogramas')->info('O usuário @user @acao o membro "@nome" (Função: @funcao) no Organograma ID: @org_id.', [
+        '@user' => \Drupal::currentUser()->getAccountName(),
+        '@acao' => $this->membroId ? 'editou' : 'cadastrou',
+        '@nome' => $valores['titulo_cargo'] . ' ' . $valores['nome'],
+        '@funcao' => $valores['nome_funcao'],
+        '@org_id' => $valores['organograma_id'],
+      ]);
 
       $botao_clicado = $form_state->getTriggeringElement()['#name'];
       if ($botao_clicado === 'save_and_new') {

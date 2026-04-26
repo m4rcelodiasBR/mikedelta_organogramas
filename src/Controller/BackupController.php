@@ -18,7 +18,13 @@ class BackupController extends ControllerBase {
       ->fetchAll();
 
     $dados_completos = $this->montarEstruturaJson($organogramas, $conexao);
-    return $this->baixarArquivo($dados_completos, 'mikedelta_backup_global');
+
+    \Drupal::logger('mikedelta_organogramas')->info('O usuário @user gerou um Backup Global (@qtd organogramas exportados).', [
+      '@user' => \Drupal::currentUser()->getAccountName(),
+      '@qtd' => count($organogramas),
+    ]);
+
+    return $this->baixarArquivo($dados_completos, 'md_organogramas_backup_global');
   }
 
   public function exportarUnicoJson($id) {
@@ -31,14 +37,20 @@ class BackupController extends ControllerBase {
       ->fetchAll(); 
 
     $dados_completos = $this->montarEstruturaJson($organograma, $conexao);
-    $nome_arquivo = 'mikedelta_backup_' . $organograma[0]->slug;
+    $nome_arquivo = 'md_organogramas_backup_' . $organograma[0]->slug;
+
+    \Drupal::logger('mikedelta_organogramas')->info('O usuário @user gerou Backup do organograma "@slug".', [
+      '@user' => \Drupal::currentUser()->getAccountName(),
+      '@slug' => $organograma[0]->slug,
+    ]);
 
     return $this->baixarArquivo($dados_completos, $nome_arquivo);
   }
 
   private function montarEstruturaJson($organogramas, $conexao) {
     $dados_completos = [
-      'versao_backup' => '2.0',
+      'titulo_backup' => 'Backup MikeDelta Organogramas',
+      'versao_backup' => '1.0',
       'data_geracao' => date('Y-m-d H:i:s'),
       'organogramas' => []
     ];

@@ -135,7 +135,7 @@ class BackupRestoreForm extends FormBase {
       unset($membro_fields['id']);
       $membro_fields['organograma_id'] = $org_id_novo;
       $membro_fields['superior_id'] = NULL;
-      $membro_fields['foto_fid'] = 0; // Zera as fotos
+      $membro_fields['foto_fid'] = 0;
 
       $id_novo = $conexao->insert('mikedelta_organograma_membros')
         ->fields($membro_fields)
@@ -162,6 +162,11 @@ class BackupRestoreForm extends FormBase {
     if ($success) {
       Cache::invalidateTags(['mikedelta_organogramas_membros']);
       \Drupal::cache('render')->deleteAll();
+      \Drupal::logger('mikedelta_organogramas')->info('O usuário @user realizou uma Restauração de Backup JSON (@orgs organogramas, @membros membros importados).', [
+        '@user' => \Drupal::currentUser()->getAccountName(),
+        '@orgs' => $results['orgs'] ?? 0,
+        '@membros' => $results['membros'] ?? 0,
+      ]);
       \Drupal::messenger()->addStatus(t('Restauração concluída com sucesso! @orgs organograma(s) e @membros membro(s) importados.', [
         '@orgs' => $results['orgs'] ?? 0,
         '@membros' => $results['membros'] ?? 0,

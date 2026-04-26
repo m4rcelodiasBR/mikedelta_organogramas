@@ -1,3 +1,7 @@
+.container.d-flex.flex-column {
+    gap: 20px !important;
+}
+
 .md-cartao {
   background: transparent;
   border: none;
@@ -9,7 +13,7 @@
   display: flex;
   overflow: visible;
   position: relative;
-  border-radius: 6px;
+  border-radius: .5rem;
   box-shadow: 0 4px 6px rgba(0,0,0,0.3);
   transition: transform 0.2s ease-in-out;
 }
@@ -31,13 +35,13 @@
 }
 
 .md-cartao-foto-container {
-  width: 4.5rem;
-  max-width: 4.6rem;
+  width: 5rem;
+  max-width: 6rem;
   background-color: #e2e8f0;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 6px 0 0 6px;
+  border-radius: .5rem 0 0 .5rem;
   overflow: hidden;
 }
 
@@ -86,12 +90,43 @@
   line-height: 1.1;
 }
 
+.md-cartao-email {
+  display: flex;
+  align-items: center;
+  justify-content: left;
+  gap: 6px;
+  font-size: .6rem;
+  margin-top: 1px;
+}
+
 .md-icone-email {
-  width: .7rem;
-  filter: brightness(0) invert(1);
-  transition: filter 0.3s ease;
+  transition: fill 0.4s ease;
 }
 
 .md-icone-email:hover {
-  filter: invert(79%) sepia(56%) saturate(614%) hue-rotate(342deg) brightness(102%) contrast(96%);
+  fill: #FAB932;
+}
+
+.md-btn-exportar-container {
+  text-align: center;
+  padding-bottom: 5rem;
+}
+
+.md-btn-exportar {
+  padding: .5rem 5rem;
+  background-color: transparent;
+  color: #3a4556;
+  border: none;
+  border-radius: .4rem;
+  font-size: .8rem;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.md-btn-exportar:hover {
+  background-color: #aec3e2;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }

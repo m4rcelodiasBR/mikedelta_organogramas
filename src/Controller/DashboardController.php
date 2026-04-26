@@ -78,7 +78,7 @@ class DashboardController extends ControllerBase {
     ];
 
     $build['instrucoes'] = [
-      '#markup' => '<div>
+      '#markup' => '<div style="margin-bottom: 20px;">
         <p>Este é o painel central de todos os organogramas existentes. Você pode criar um Organograma clicando no botão "Criar Novo Organograma" ou importar clicando em "Backup/Restore", onde você poderá importar um ou mais organogramas. Ações possíveis nesta lista são:</p>
         <ul style="margin-top: 5px;">
           <li><strong>Visualizar:</strong> Abre a versão pública interativa do organograma.</li>
